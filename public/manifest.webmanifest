@@ -1,0 +1,15 @@
+{
+  "name": "CODEX-TH Portfolio",
+  "short_name": "CODEX-TH",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/Logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

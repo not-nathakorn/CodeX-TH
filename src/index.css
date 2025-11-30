@@ -1,0 +1,356 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Modern Dark Theme - Primary Colors (HSL) */
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 100% 60%;
+    --primary-foreground: 222 47% 5%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 200 100% 55%;
+    --accent-foreground: 222 47% 5%;
+
+    --success: 150 70% 50%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 210 100% 60%;
+
+    /* Glass Effect Tokens */
+    --glass-bg: 222 47% 11%;
+    --glass-opacity: 0.7;
+    --glass-border: 217 33% 25%;
+    --glass-border-opacity: 0.3;
+    --glass-blur: 20px;
+
+    /* Shadow Tokens */
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --shadow-hover: 0 16px 48px 0 rgba(0, 0, 0, 0.5);
+    --glow-primary: 0 0 60px hsla(210, 100%, 60%, 0.4);
+    --glow-accent: 0 0 60px hsla(200, 100%, 55%, 0.4);
+
+    /* Gradient Tokens */
+    --gradient-background: linear-gradient(
+      135deg,
+      hsl(222, 47%, 5%) 0%,
+      hsl(222, 47%, 8%) 50%,
+      hsl(222, 47%, 5%) 100%
+    );
+    --gradient-shine: linear-gradient(
+      135deg,
+      hsla(0, 0%, 100%, 0.1) 0%,
+      hsla(0, 0%, 100%, 0) 100%
+    );
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(210, 100%, 60%) 0%,
+      hsl(200, 100%, 55%) 100%
+    );
+    --gradient-text: linear-gradient(
+      135deg,
+      hsl(210, 100%, 70%),
+      hsl(200, 100%, 65%)
+    );
+
+    /* Border Radius Scale */
+    --radius-sm: 0.75rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.25rem;
+    --radius-full: 9999px;
+
+    --radius: 1rem;
+
+    /* Animation Timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* Smooth theme transitions */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .light {
+    /* Modern Light Theme */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 220 15% 95%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 220 15% 95%;
+    --muted-foreground: 220 15% 40%;
+
+    --accent: 200 100% 45%;
+    --accent-foreground: 210 40% 98%;
+
+    --success: 150 70% 45%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 210 100% 50%;
+
+    /* Glass Effect - Light Mode */
+    --glass-bg: 0 0% 100%;
+    --glass-opacity: 0.7;
+    --glass-border: 220 15% 85%;
+    --glass-border-opacity: 0.3;
+    --glass-blur: 20px;
+
+    /* Shadow Tokens - Light Mode */
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 16px 48px 0 rgba(0, 0, 0, 0.15);
+    --glow-primary: 0 0 60px hsla(210, 100%, 50%, 0.3);
+    --glow-accent: 0 0 60px hsla(200, 100%, 45%, 0.3);
+
+    /* Gradients - Light Mode */
+    --gradient-background: linear-gradient(
+      135deg,
+      hsl(210, 40%, 98%) 0%,
+      hsl(220, 35%, 95%) 50%,
+      hsl(210, 40%, 98%) 100%
+    );
+    --gradient-text: linear-gradient(
+      135deg,
+      hsl(210, 100%, 45%),
+      hsl(200, 100%, 40%)
+    );
+  }
+}
+
+
+@layer base {
+  * {
+    @apply border-border;
+    /* Smooth color transitions for theme switching */
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Pseudo-elements smooth transitions */
+  *::before,
+  *::after {
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Prevent transition on page load */
+  .no-transition * {
+    transition: none !important;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    /* background: var(--gradient-background); */
+    background: transparent;
+    /* background-attachment: fixed; */
+    overflow-x: hidden;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+  }
+
+  /* Smooth Scroll */
+  html {
+    scroll-behavior: smooth;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+}
+
+/* Custom Utility Classes */
+@layer utilities {
+  /* Glass Effect */
+  .glass {
+    background: hsla(var(--glass-bg), var(--glass-opacity));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsla(var(--glass-border), var(--glass-border-opacity));
+  }
+
+  .glass-strong {
+    background: hsla(var(--glass-bg), 0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: var(--gradient-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow Effects */
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+
+  /* Hover Lift */
+  .hover-lift {
+    transition: var(--transition-smooth);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Shine Effect */
+  .shine-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shine-effect::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: var(--gradient-shine);
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .shine-effect:hover::before {
+    opacity: 1;
+    animation: shine 1s ease;
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+      transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
+  }
+
+  /* Navbar Floating Effect */
+  .navbar-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+
+  /* Enhanced Glassmorphism for Navbar */
+  .glass-navbar {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+
+  .dark .glass-navbar {
+    background: rgba(23, 23, 23, 0.7);
+  }
+
+  /* Hide Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Blob Animation for Footer */
+  @keyframes blob {
+    0%, 100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+}
