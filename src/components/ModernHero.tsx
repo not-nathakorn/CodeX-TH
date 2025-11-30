@@ -246,7 +246,7 @@ export const ModernHero = () => {
       </div>
 
       {/* Marquee Section */}
-      <div className="w-full relative z-10 pb-4">
+      <div className="w-full relative z-10 pb-24">
         <InfiniteMarquee />
       </div>
 
