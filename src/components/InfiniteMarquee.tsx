@@ -46,7 +46,7 @@ const renderIcon = (tech: typeof technologies[0]) => {
 };
 
 const Card = ({ tech }: { tech: typeof technologies[0] }) => (
-  <div className="mx-4 flex items-center gap-3 rounded-full border border-white/50 dark:border-white/10 bg-white/20 dark:bg-black/20 px-6 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-lg backdrop-blur-xl hover:scale-105 transition-all cursor-default hover:shadow-xl hover:bg-white/40 dark:hover:bg-neutral-800/40 hover:border-white/60">
+  <div className="mx-4 flex items-center gap-3 rounded-full border border-white/50 dark:border-white/10 bg-white/20 dark:bg-black/20 px-6 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-lg backdrop-blur-sm hover:scale-105 transition-all cursor-default hover:shadow-xl hover:bg-white/40 dark:hover:bg-neutral-800/40 hover:border-white/60">
     {renderIcon(tech)}
     <span>{tech.name}</span>
   </div>

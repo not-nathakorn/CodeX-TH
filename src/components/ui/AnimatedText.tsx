@@ -14,10 +14,10 @@ export const AnimatedText = ({ children, className, block = false, element = "sp
     <AnimatePresence mode="wait">
       <MotionComponent
         key={children?.toString()}
-        initial={{ opacity: 0, y: 5, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -5, filter: "blur(8px)" }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -5 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className={className}
         style={{ display: block ? "block" : "inline-block" }}
       >

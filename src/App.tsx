@@ -9,6 +9,7 @@ import { NavigationDock } from "@/components/NavigationDock";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
             <NavigationDock />
           </BrowserRouter>
           <Analytics />
+          <SpeedInsights />
         </TooltipProvider>
       </LanguageProvider>
     </ThemeProvider>

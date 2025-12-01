@@ -52,7 +52,7 @@ export const ModernNavigation = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <TextHoverEffect text="CodeX-TH" />
+              <TextHoverEffect text="CodeX" />
             </motion.a>
 
             {/* Horizontal Scrollable Menu - Mobile & Tablet */}

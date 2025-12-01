@@ -124,30 +124,33 @@ export const ModernHero = () => {
                 transition={{ delay: 0.5, duration: 0.8 }}
                 className="flex flex-wrap gap-4 justify-center lg:justify-start"
               >
-                {/* Primary Button - Sleek Gradient */}
+                {/* Primary Button - Sleek Gradient with Shine */}
                 <motion.button
                   onClick={() => handleScroll("projects")}
-                  className="group relative px-8 py-4 text-base font-bold rounded-full overflow-hidden text-white shadow-lg hover:shadow-blue-500/30 transition-all"
+                  className="group relative px-8 py-4 text-base font-bold rounded-full overflow-hidden text-white shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 shine-effect"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 group-hover:from-blue-500 group-hover:to-indigo-500 transition-colors duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
                   <div className="relative flex items-center gap-2">
                     <Sparkles className="w-5 h-5" />
                     <AnimatedText>{t("viewProjects")}</AnimatedText>
                   </div>
                 </motion.button>
 
-                {/* Secondary Button - Minimal Outline */}
+                {/* Secondary Button - Glassmorphism */}
                 <motion.button
                   onClick={() => handleScroll("contact")}
-                  className="group relative px-8 py-4 text-base font-bold rounded-full bg-transparent border-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
+                  className="group relative px-8 py-4 text-base font-bold rounded-full overflow-hidden text-slate-700 dark:text-slate-200 shadow-md hover:shadow-lg transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
+                  <div className="absolute inset-0 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-white/50 dark:border-slate-700/50 group-hover:bg-white/80 dark:group-hover:bg-slate-800/80 transition-colors duration-300"></div>
                   <div className="relative flex items-center gap-2">
-                    <Mail className="w-5 h-5" />
-                    <AnimatedText>{t("getInTouch")}</AnimatedText>
+                    <Mail className="w-5 h-5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+                    <span className="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <AnimatedText>{t("getInTouch")}</AnimatedText>
+                    </span>
                   </div>
                 </motion.button>
               </motion.div>
@@ -178,7 +181,7 @@ export const ModernHero = () => {
                   <div className="flex flex-col items-center justify-center -mt-4 space-y-2">
                     {/* Title */}
                     <h3 className="max-w-xs !pb-0 !m-0 font-extrabold text-3xl text-center text-slate-900 dark:text-white tracking-tight" style={{ lineHeight: language === 'th' ? '1.4' : '1.2' }}>
-                      {language === 'th' ? 'ณฐกร พิกรมสุข' : 'Na-thakorn'}
+                      {language === 'th' ? 'ณต' : "N'Not"}
                     </h3>
                     
                     {/* Subtitle with gradient */}

@@ -1,8 +1,8 @@
-# CodeX-TH Portfolio
+# CodeX Portfolio
 
 ## Project Info
 
-This is the personal portfolio website of Na-thakorn Pikromsuk (CodeX-TH), a Full-Stack Developer and M.Ed. Student specializing in innovative educational technology systems.
+This is the personal portfolio website of Na-thakorn Pikromsuk (CodeX), a Full-Stack Developer and M.Ed. Student specializing in innovative educational technology systems.
 
 ## Tech Stack
 

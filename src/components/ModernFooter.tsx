@@ -50,7 +50,7 @@ export const ModernFooter = () => {
               <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
             </motion.div>
             <div className="h-10 w-40 md:h-12 md:w-48 flex items-center justify-center -my-2">
-              <TextHoverEffect text="CodeX-TH" />
+              <TextHoverEffect text="CodeX" />
             </div>
             <motion.div
               animate={{ rotate: [360, 0] }}

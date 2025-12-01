@@ -150,22 +150,8 @@ All colors MUST be HSL.
 }
 
 @layer base {
-  * {
-    @apply border-border;
-    /* Smooth color transitions for theme switching */
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Pseudo-elements smooth transitions */
-  *::before,
-  *::after {
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  /* Removed global transition for performance */
+  /* * { ... } rule caused major lag on mobile */
 
   /* Prevent transition on page load */
   .no-transition * {
