@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { ModernNavigation } from "@/components/ModernNavigation";
 import { ModernHero } from "@/components/ModernHero";
@@ -8,14 +8,15 @@ import { ModernFooter } from "@/components/ModernFooter";
 import { Meteors } from "@/components/effects/Meteors";
 import { Award, BookOpen, Globe, Mail, Linkedin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { ToolsShowcase } from "@/components/ToolsShowcase";
-import { GlowingFeatures } from "@/components/GlowingFeatures";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 import { CopyEmailButton } from "@/components/CopyEmailButton";
 import { LineButton } from "@/components/LineButton";
 import { MessageCircle } from "lucide-react";
 import { supabase, Project, Education, Experience } from "@/lib/supabase";
-import ThailandEducationMap from "@/components/ThailandEducationMap";
+
+const ThailandEducationMap = lazy(() => import("@/components/ThailandEducationMap"));
+const ToolsShowcase = lazy(() => import("@/components/ToolsShowcase"));
+const GlowingFeatures = lazy(() => import("@/components/GlowingFeatures"));
 
 const skills = [
   "React & TypeScript",
@@ -66,10 +67,9 @@ const Index = () => {
         setEducation(educationData || []);
         setExperience(experienceData || []);
         
-        console.log('🌐 Website data refreshed:', new Date().toLocaleTimeString());
-        console.log('  📦 Projects:', projectsData?.length, projectsData);
-        console.log('  🎓 Education:', educationData?.length, educationData);
-        console.log('  💼 Experience:', experienceData?.length, experienceData);
+        setProjects(projectsData || []);
+        setEducation(educationData || []);
+        setExperience(experienceData || []);
       } catch (error) {
         console.error('❌ Error fetching data:', error);
       } finally {
@@ -82,26 +82,16 @@ const Index = () => {
     // Subscribe to realtime changes (Single Channel)
     const channel = supabase
       .channel('public-website-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, (payload) => {
-        console.log('🔄 Projects changed:', payload);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
         fetchData();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'education' }, (payload) => {
-        console.log('🔄 Education changed:', payload);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'education' }, () => {
         fetchData();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'experience' }, (payload) => {
-        console.log('🔄 Experience changed:', payload);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'experience' }, () => {
         fetchData();
       })
-      .subscribe((status) => {
-        console.log('📡 Realtime status:', status);
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Connected to Realtime');
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ Realtime Connection Error');
-        }
-      });
+      .subscribe();
 
     // Cleanup
     return () => {
@@ -256,7 +246,9 @@ const Index = () => {
               </div>
 
             <div className="relative z-10 mt-12 flex justify-center">
-              <ToolsShowcase />
+              <Suspense fallback={<div className="h-40 w-full animate-pulse bg-white/5 rounded-xl" />}>
+                <ToolsShowcase />
+              </Suspense>
             </div>
             </div>
           </motion.div>
@@ -288,7 +280,9 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <GlowingFeatures />
+          <Suspense fallback={<div className="h-96 w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <GlowingFeatures />
+          </Suspense>
         </div>
       </section>
 
@@ -349,7 +343,9 @@ const Index = () => {
       {/* Thailand Education Map */}
       <section className="relative py-8 md:py-12 lg:py-16 px-4 overflow-hidden">
         <div className="container mx-auto max-w-6xl">
-          <ThailandEducationMap />
+          <Suspense fallback={<div className="h-[600px] w-full animate-pulse bg-white/5 rounded-xl" />}>
+            <ThailandEducationMap />
+          </Suspense>
         </div>
       </section>
 

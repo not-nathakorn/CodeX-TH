@@ -22,7 +22,6 @@ export const useAnalytics = () => {
         }
 
         // 2. Parse User Agent
-        // @ts-ignore
         const parser = new UAParser(navigator.userAgent);
         const result = parser.getResult();
 

@@ -136,7 +136,7 @@ const ThailandEducationMap = () => {
         (payload) => {
           console.log('Map settings updated:', payload);
           if (payload.new) {
-            const newData = payload.new as any;
+            const newData = payload.new as { is_visible: boolean; enabled_universities: string[] };
             setMapVisible(newData.is_visible);
             setEnabledUniversities(newData.enabled_universities || []);
           }
@@ -215,7 +215,6 @@ const ThailandEducationMap = () => {
           const depthPath = path.cloneNode(true) as SVGElement;
           depthPath.setAttribute('fill', theme.depth);
           depthPath.setAttribute('stroke', 'none');
-          // @ts-ignore
           regionGroups[region].depth.push(depthPath.outerHTML);
 
           // Configure Surface Path (Glassy Top)
@@ -224,7 +223,6 @@ const ThailandEducationMap = () => {
           path.setAttribute('stroke-width', '1');
           path.setAttribute('class', 'province-path transition-all duration-300');
           
-          // @ts-ignore
           regionGroups[region].surface.push(path.outerHTML);
         });
 
@@ -274,21 +272,22 @@ const ThailandEducationMap = () => {
     if (!mapContainerRef.current) return;
     
     const groups = mapContainerRef.current.querySelectorAll('.region-group');
-    groups.forEach((group: any) => {
-      const region = group.getAttribute('data-region');
+    groups.forEach((group) => {
+      const element = group as HTMLElement;
+      const region = element.getAttribute('data-region');
       if (region) {
         if (enabledUniversities.includes(region)) {
-          group.style.display = 'block';
-          group.style.opacity = '1';
-          group.style.pointerEvents = 'all';
+          element.style.display = 'block';
+          element.style.opacity = '1';
+          element.style.pointerEvents = 'all';
         } else {
           // Option 1: Hide completely
-          // group.style.display = 'none';
+          // element.style.display = 'none';
           
           // Option 2: Fade out and disable interaction (Better for UX)
-          group.style.opacity = '0.1';
-          group.style.pointerEvents = 'none';
-          group.style.filter = 'grayscale(100%)';
+          element.style.opacity = '0.1';
+          element.style.pointerEvents = 'none';
+          element.style.filter = 'grayscale(100%)';
         }
       }
     });
@@ -299,8 +298,9 @@ const ThailandEducationMap = () => {
     if (!mapContainerRef.current) return;
     
     const groups = mapContainerRef.current.querySelectorAll('.region-group');
-    groups.forEach((group: any) => {
-      const region = group.getAttribute('data-region');
+    groups.forEach((group) => {
+      const element = group as HTMLElement;
+      const region = element.getAttribute('data-region');
       
       // Skip if region is disabled
       if (region && !enabledUniversities.includes(region)) return;
@@ -308,17 +308,17 @@ const ThailandEducationMap = () => {
       const baseTransform = 'translate(0px, 0px)';
 
       if (hoveredRegion && region === hoveredRegion) {
-        group.style.transform = `${baseTransform} scale(1.02) translateY(-10px)`;
-        group.style.filter = 'drop-shadow(0px 20px 30px rgba(0,0,0,0.2)) brightness(1.1)';
-        group.style.zIndex = '50';
+        element.style.transform = `${baseTransform} scale(1.02) translateY(-10px)`;
+        element.style.filter = 'drop-shadow(0px 20px 30px rgba(0,0,0,0.2)) brightness(1.1)';
+        element.style.zIndex = '50';
       } else if (hoveredRegion && region !== hoveredRegion) {
-        group.style.transform = `${baseTransform} scale(0.98)`;
-        group.style.filter = 'brightness(0.8) opacity(0.7) grayscale(0.2)';
-        group.style.zIndex = '1';
+        element.style.transform = `${baseTransform} scale(0.98)`;
+        element.style.filter = 'brightness(0.8) opacity(0.7) grayscale(0.2)';
+        element.style.zIndex = '1';
       } else {
-        group.style.transform = `${baseTransform} scale(1)`;
-        group.style.filter = 'drop-shadow(0px 5px 10px rgba(0,0,0,0.1))';
-        group.style.zIndex = '1';
+        element.style.transform = `${baseTransform} scale(1)`;
+        element.style.filter = 'drop-shadow(0px 5px 10px rgba(0,0,0,0.1))';
+        element.style.zIndex = '1';
       }
     });
   }, [hoveredRegion, enabledUniversities]);
@@ -536,7 +536,7 @@ const ThailandEducationMap = () => {
             theme={REGION_THEMES.north}
             isActive={activeRegion === 'north'}
             isHovered={hoveredRegion === 'north'}
-            onClick={(e: any) => { e.stopPropagation(); setActiveRegion(activeRegion === 'north' ? null : 'north'); setSelectedMapRegion(null); }}
+            onClick={(e) => { e.stopPropagation(); setActiveRegion(activeRegion === 'north' ? null : 'north'); setSelectedMapRegion(null); }}
             onHover={() => setHoveredRegion('north')}
             onLeave={() => setHoveredRegion(null)}
           />
@@ -553,7 +553,7 @@ const ThailandEducationMap = () => {
             theme={REGION_THEMES.northeast}
             isActive={activeRegion === 'northeast'}
             isHovered={hoveredRegion === 'northeast'}
-            onClick={(e: any) => { e.stopPropagation(); setActiveRegion(activeRegion === 'northeast' ? null : 'northeast'); setSelectedMapRegion(null); }}
+            onClick={(e) => { e.stopPropagation(); setActiveRegion(activeRegion === 'northeast' ? null : 'northeast'); setSelectedMapRegion(null); }}
             onHover={() => setHoveredRegion('northeast')}
             onLeave={() => setHoveredRegion(null)}
           />
@@ -570,7 +570,7 @@ const ThailandEducationMap = () => {
             theme={REGION_THEMES.central}
             isActive={activeRegion === 'central'}
             isHovered={hoveredRegion === 'central'}
-            onClick={(e: any) => { e.stopPropagation(); setActiveRegion(activeRegion === 'central' ? null : 'central'); setSelectedMapRegion(null); }}
+            onClick={(e) => { e.stopPropagation(); setActiveRegion(activeRegion === 'central' ? null : 'central'); setSelectedMapRegion(null); }}
             onHover={() => setHoveredRegion('central')}
             onLeave={() => setHoveredRegion(null)}
           />
@@ -587,7 +587,7 @@ const ThailandEducationMap = () => {
             theme={REGION_THEMES.south}
             isActive={activeRegion === 'south'}
             isHovered={hoveredRegion === 'south'}
-            onClick={(e: any) => { e.stopPropagation(); setActiveRegion(activeRegion === 'south' ? null : 'south'); setSelectedMapRegion(null); }}
+            onClick={(e) => { e.stopPropagation(); setActiveRegion(activeRegion === 'south' ? null : 'south'); setSelectedMapRegion(null); }}
             onHover={() => setHoveredRegion('south')}
             onLeave={() => setHoveredRegion(null)}
           />
@@ -640,7 +640,21 @@ const ThailandEducationMap = () => {
   );
 };
 
-const GlassMarker = ({ region, logo, data, position, delay, theme, isActive, isHovered, onClick, onHover, onLeave }: any) => {
+interface GlassMarkerProps {
+  region: string;
+  logo: string;
+  data: MapUniversity;
+  position: string;
+  delay: number;
+  theme: typeof REGION_THEMES[keyof typeof REGION_THEMES];
+  isActive: boolean;
+  isHovered: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  onHover: () => void;
+  onLeave: () => void;
+}
+
+const GlassMarker = ({ region, logo, data, position, delay, theme, isActive, isHovered, onClick, onHover, onLeave }: GlassMarkerProps) => {
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.8 }}
@@ -701,7 +715,7 @@ const GlassMarker = ({ region, logo, data, position, delay, theme, isActive, isH
           >
             <div className="relative w-24 h-24 rounded-3xl bg-white/40 backdrop-blur-md border border-white/60 shadow-lg flex items-center justify-center group-hover:bg-white/60 transition-all z-20">
               <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-sm" style={{ background: theme.color }} />
-              <img src={logo} alt={data.nameEn} className="w-16 h-16 object-contain drop-shadow-md" />
+              <img src={logo} alt={data.name_en} className="w-16 h-16 object-contain drop-shadow-md" />
             </div>
             
             {/* Tooltip - Controlled by isHovered prop now */}

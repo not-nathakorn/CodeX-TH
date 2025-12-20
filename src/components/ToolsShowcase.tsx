@@ -7,7 +7,7 @@ import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 
-export function ToolsShowcase() {
+export default function ToolsShowcase() {
   const { t } = useLanguage();
 
   return (

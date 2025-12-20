@@ -1,71 +1,87 @@
-import { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+// src/pages/CallbackPage.tsx
+// --------------------------------------------------------
+// OAuth Callback Handler - SECURE VERSION
+// ✅ Exchanges code for tokens
+// ✅ Receives HttpOnly Cookies automatically
+// ✅ Redirects to dashboard after success
+// --------------------------------------------------------
+import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import LazyFallback from "@/components/LazyFallback";
 
-export const CallbackPage = () => {
+const AUTH_HUB = import.meta.env.VITE_BLACKBOX_AUTH_URL || "https://bbh.codex-th.com";
+const CLIENT_ID = import.meta.env.VITE_BLACKBOX_CLIENT_ID;
+
+export default function CallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { authenticate } = useAuth();
+  const { refreshAuth } = useAuth();
   const processedRef = useRef(false);
 
   useEffect(() => {
-    // Prevent double execution in React Strict Mode
     if (processedRef.current) return;
     processedRef.current = true;
 
-    // Debug logging
-    console.log("Callback Page Loaded");
-    console.log("Search Params:", searchParams.toString());
-    console.log("Hash:", window.location.hash);
-    console.log("Full URL:", window.location.href);
+    const handleCallback = async () => {
+      const code = searchParams.get("code");
+      const error = searchParams.get("error");
 
-    // Helper to get param from search or hash
-    const getParam = (name: string) => {
-      // Check search params first
-      if (searchParams.has(name)) return searchParams.get(name);
-      
-      // Check hash params
-      const hash = window.location.hash.substring(1); // remove #
-      const hashParams = new URLSearchParams(hash);
-      if (hashParams.has(name)) return hashParams.get(name);
-      
-      return null;
+      // Handle errors
+      if (error) {
+        console.error("Auth Error:", error);
+        navigate("/login?error=" + error);
+        return;
+      }
+
+      if (!code) {
+        navigate("/");
+        return;
+      }
+
+      try {
+        // ✅ Exchange code for tokens
+        const response = await fetch(`${AUTH_HUB}/api/oauth/token`, {
+          method: "POST",
+          credentials: "include", // ✅ รับ HttpOnly Cookies
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            client_id: CLIENT_ID,
+            client_secret: import.meta.env.VITE_BLACKBOX_CLIENT_SECRET,
+            grant_type: "authorization_code"
+          })
+        });
+
+        const data = await response.json();
+        console.log("Token exchange response:", data);
+
+        if (data.success && data.user) {
+          // ✅ Cookie ถูก set แล้ว รอสักครู่ให้ Browser บันทึก Cookie (Localhost อาจจะช้าหน่อย)
+          console.log("Cookie set attempt finished. Waiting for propagation...");
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          console.log("Attempting to verify session via refreshAuth()...");
+          await refreshAuth();
+          
+          // Redirect to home or original page
+          const returnUrl = searchParams.get("state") || "/";
+          navigate(returnUrl);
+        } else {
+          console.error("Token exchange failed:", data);
+          navigate("/login?error=token_exchange_failed");
+        }
+      } catch (err) {
+        console.error("Callback error:", err);
+        navigate("/login?error=callback_failed");
+      }
     };
 
-    const code = getParam('code');
-    const token = getParam('token');
-    const accessToken = getParam('access_token');
-    const idToken = getParam('id_token');
-
-    const hasAuthParams = code || token || accessToken || idToken;
-
-    if (hasAuthParams) {
-      console.log("Auth params found, authenticating...");
-      // In a real scenario, you would parse the token from the URL here.
-      // For now, we assume if the user reaches this page with params, the auth was successful.
-      // We set a token in localStorage to persist the session.
-      const authToken = token || accessToken || code || 'authenticated';
-      
-      // Update auth context state
-      authenticate(authToken);
-      
-      // Redirect to the admin dashboard
-      navigate('/admin');
-    } else {
-      // If someone tries to access /admin/callback directly without params (cheating),
-      // we redirect them back to the login page or home
-      console.error("Security Alert: Invalid callback attempt - No auth params found");
-      navigate('/'); 
-    }
-  }, [navigate, searchParams, authenticate]);
+    handleCallback();
+  }, [searchParams, navigate, refreshAuth]);
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Authenticating...</h2>
-        <p className="text-muted-foreground">Please wait while we log you in.</p>
-        <p className="text-xs text-muted-foreground mt-4">Checking credentials...</p>
-      </div>
-    </div>
+    <LazyFallback message="Setting up your secure session..." />
   );
-};
+}
+

@@ -67,7 +67,7 @@ export const MapSettingsManager = () => {
         setIsVisible(data.is_visible);
         setEnabledUniversities(data.enabled_universities || []);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching map settings:', error);
       toast.error('ไม่สามารถโหลดการตั้งค่าแผนที่ได้');
     }
@@ -82,7 +82,7 @@ export const MapSettingsManager = () => {
 
       if (error) throw error;
       setUniversities(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching universities:', error);
       toast.error('ไม่สามารถโหลดข้อมูลมหาวิทยาลัยได้');
     }
@@ -104,7 +104,7 @@ export const MapSettingsManager = () => {
       setSettings(data);
       setIsVisible(data.is_visible);
       setEnabledUniversities(data.enabled_universities);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating default settings:', error);
     }
   };
@@ -151,9 +151,10 @@ export const MapSettingsManager = () => {
 
       toast.success('บันทึกการตั้งค่าแผนที่สำเร็จ');
       await fetchSettings();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving map settings:', error);
-      toast.error(`ไม่สามารถบันทึกการตั้งค่าได้: ${error.message || 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`ไม่สามารถบันทึกการตั้งค่าได้: ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -186,7 +187,7 @@ export const MapSettingsManager = () => {
       await fetchUniversities();
       setShowEditDialog(false);
       setEditingUniversity(null);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating university:', error);
       toast.error('ไม่สามารถอัพเดทข้อมูลได้');
     } finally {

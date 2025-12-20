@@ -10,14 +10,14 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AuthGuard } from "@/components/AuthGuard";
 import LazyFallback from "@/components/LazyFallback";
 import React from "react";
 
 // Lazy load pages to improve performance
-const Index = React.lazy(() => import("./pages/Index"));
+import Index from "./pages/Index";
 const AdminLayout = React.lazy(() => import("./pages/AdminLayout").then(module => ({ default: module.AdminLayout })));
-const CallbackPage = React.lazy(() => import("./pages/CallbackPage").then(module => ({ default: module.CallbackPage })));
+const CallbackPage = React.lazy(() => import("./pages/CallbackPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -42,10 +42,11 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/admin" element={
-                    <ProtectedRoute>
+                    <AuthGuard requiredRole="admin">
                       <AdminLayout />
-                    </ProtectedRoute>
+                    </AuthGuard>
                   } />
+                  <Route path="/callback" element={<CallbackPage />} />
                   <Route path="/admin/callback" element={<CallbackPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

@@ -51,6 +51,8 @@ export default defineConfig(({ mode }) => ({
       'react-router-dom',
       'framer-motion',
       '@tanstack/react-query',
+      'react-icons/go',
+      'react-icons',
     ],
   },
 }));

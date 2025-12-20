@@ -95,7 +95,7 @@ const GlowingEffect = memo(
 
       if (!isActive) return;
 
-      let targetAngle =
+      const targetAngle =
         (180 * Math.atan2(mouseY - center[1], mouseX - center[0])) / Math.PI + 90;
 
       // Smooth angle interpolation

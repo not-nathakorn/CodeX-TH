@@ -66,6 +66,7 @@ CREATE OR REPLACE FUNCTION public.update_map_settings_secure(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public, extensions, pg_temp
 AS $$
 DECLARE
   v_result JSONB;

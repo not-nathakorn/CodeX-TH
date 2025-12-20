@@ -1,0 +1,23 @@
+# GitLeaks Ignore File
+# This file contains fingerprints of known false positives
+
+# Documentation files with example keys
+ADMIN_SETUP.md:generic-api-key:40
+ADMIN_SETUP.md:jwt:*
+
+# Debug files (already in .gitignore) - specific fingerprints
+debug-realtime.html:jwt:114
+
+# Build output (already in .gitignore) - specific fingerprints
+dist/assets/index-PnzCm9nm.js:jwt:63
+dist/**:jwt:*
+dist/**:generic-api-key:*
+
+# Environment files (already in .gitignore) - specific fingerprints
+.env:jwt:2
+.env*:jwt:*
+.env*:generic-api-key:*
+
+# Template files (safe - no real secrets)
+*.template.html:jwt:*
+*.template.html:generic-api-key:*

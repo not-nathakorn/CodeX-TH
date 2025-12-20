@@ -25,6 +25,11 @@ dist-ssr
 supabase-schema.sql
 !supabase-schema-template.sql
 
+# Debug files (may contain hardcoded credentials for testing)
+debug-*.html
+debug-*.js
+test-*.html
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

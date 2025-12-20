@@ -6,17 +6,69 @@ import { Loader2, RefreshCcw, Trash2, Globe, Monitor, Smartphone, Activity } fro
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+interface WebsiteVisit {
+  id: string;
+  created_at: string;
+  page_path: string;
+  referrer: string;
+  session_id: string;
+  os: string;
+  device_type: string;
+  country: string;
+}
+
+interface CountData {
+  name: string;
+  count: number;
+}
+
+interface ChartDataPoint {
+  name: string;
+  visitors: number;
+  pageViews: number;
+}
+
+interface DailyStats {
+  [date: string]: {
+    name: string;
+    visitors: Set<string>;
+    pageViews: number;
+  };
+}
+
+interface CardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  sub: string;
+}
+
+interface ListCardProps {
+  title: string;
+  icon: React.ReactElement;
+  data: CountData[];
+}
+
 export const AnalyticsDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<{
+    visitors: number;
+    pageViews: number;
+    chartData: ChartDataPoint[];
+    topPages: CountData[];
+    referrers: CountData[];
+    os: CountData[];
+    devices: CountData[];
+    countries: CountData[];
+  }>({
     visitors: 0,
     pageViews: 0,
-    chartData: [] as any[],
-    topPages: [] as any[],
-    referrers: [] as any[],
-    os: [] as any[],
-    devices: [] as any[],
-    countries: [] as any[]
+    chartData: [],
+    topPages: [],
+    referrers: [],
+    os: [],
+    devices: [],
+    countries: []
   });
 
   useEffect(() => {
@@ -49,7 +101,7 @@ export const AnalyticsDashboard = () => {
       }
 
       // 1. Process Chart Data
-      const dailyStats = data.reduce((acc: any, visit: any) => {
+      const dailyStats = data.reduce<DailyStats>((acc, visit) => {
         const date = new Date(visit.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         if (!acc[date]) acc[date] = { name: date, visitors: new Set(), pageViews: 0 };
         
@@ -59,26 +111,28 @@ export const AnalyticsDashboard = () => {
         return acc;
       }, {});
 
-      const chartData = Object.values(dailyStats).map((day: any) => ({
-        ...day,
-        visitors: day.visitors.size
+      const chartData: ChartDataPoint[] = Object.values(dailyStats).map((day) => ({
+        name: day.name,
+        visitors: day.visitors.size,
+        pageViews: day.pageViews
       }));
 
       // Helper to process counts
-      const processCount = (key: string, labelKey?: string) => {
-        const counts = data.reduce((acc: any, visit: any) => {
+      const processCount = (key: keyof WebsiteVisit): CountData[] => {
+        const counts = data.reduce<Record<string, number>>((acc, visit) => {
           const val = visit[key] || 'Unknown';
-          acc[val] = (acc[val] || 0) + 1;
+          const valStr = String(val);
+          acc[valStr] = (acc[valStr] || 0) + 1;
           return acc;
         }, {});
         return Object.entries(counts)
           .map(([name, count]) => ({ name, count }))
-          .sort((a: any, b: any) => b.count - a.count)
+          .sort((a, b) => b.count - a.count)
           .slice(0, 5);
       };
 
       // Unique Visitors
-      const uniqueVisitors = new Set(data.map((v: any) => v.session_id)).size;
+      const uniqueVisitors = new Set(data.map((v) => v.session_id)).size;
 
       setStats({
         visitors: uniqueVisitors,
@@ -243,7 +297,7 @@ export const AnalyticsDashboard = () => {
 };
 
 // Sub-components for cleaner code
-const Card = ({ title, value, icon, sub }: any) => (
+const Card = ({ title, value, icon, sub }: CardProps) => (
   <motion.div 
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
@@ -265,7 +319,7 @@ const Card = ({ title, value, icon, sub }: any) => (
   </motion.div>
 );
 
-const ListCard = ({ title, icon, data }: any) => (
+const ListCard = ({ title, icon, data }: ListCardProps) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -277,7 +331,7 @@ const ListCard = ({ title, icon, data }: any) => (
       {title}
     </h3>
     <div className="space-y-3">
-      {data.map((item: any, i: number) => (
+      {data.map((item, i) => (
         <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-100 dark:border-slate-700">
           <span className="text-sm font-medium text-foreground/80 truncate max-w-[70%]">{item.name}</span>
           <span className="text-xs font-bold bg-primary/20 text-primary px-2 py-1 rounded-lg">{item.count}</span>

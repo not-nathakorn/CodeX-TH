@@ -57,7 +57,7 @@ export const ModernHero = () => {
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
+                transition={{ duration: 0.5 }}
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-950/30 rounded-full border border-blue-200 dark:border-blue-800">
                   <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
@@ -72,7 +72,7 @@ export const ModernHero = () => {
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
                   className="lg:text-left mb-2"
                 >
                   <span className="inline-block px-3 py-1 text-sm font-bold text-white bg-gradient-to-r from-slate-500 to-slate-600 rounded-lg shadow-md">
@@ -85,7 +85,7 @@ export const ModernHero = () => {
               <motion.h1
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
+                transition={{ delay: 0.1, duration: 0.6 }}
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 pb-2"
                 style={{ 
                   lineHeight: language === 'th' ? '1.2' : '1.1',
@@ -98,7 +98,7 @@ export const ModernHero = () => {
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
               >
                 <div className="relative inline-flex group">
                   {/* Gradient border glow */}
@@ -121,7 +121,7 @@ export const ModernHero = () => {
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
                 className="flex flex-wrap gap-4 justify-center lg:justify-start"
               >
                 {/* Primary Button - Sleek Gradient with Shine */}
@@ -160,7 +160,7 @@ export const ModernHero = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
               className="hidden lg:flex justify-center items-center h-[40rem]"
             >
               <PinContainer
