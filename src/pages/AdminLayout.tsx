@@ -12,10 +12,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { ContentManager } from "@/components/admin/ContentManager";
-import { useAuth } from "@/contexts/AuthContext";
-
+import { SettingsManager } from "@/components/admin/SettingsManager";
 export function AdminLayout() {
-  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'content' | 'settings'>('dashboard');
   const [open, setOpen] = useState(false);
 
@@ -52,14 +50,6 @@ export function AdminLayout() {
       ),
       onClick: () => {}, // href handles navigation
     },
-    {
-      label: "Logout",
-      href: "#",
-      icon: (
-        <IconLogout className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-      onClick: () => logout(),
-    },
   ];
 
   return (
@@ -94,24 +84,24 @@ export function AdminLayout() {
               }}
             />
           </div>
-        </SidebarBody>
+      </SidebarBody>
       </Sidebar>
-      <div className="flex flex-1 overflow-hidden">
-        <div className="p-4 md:p-8 flex flex-col gap-6 flex-1 w-full h-full overflow-y-auto">
+      <div className="flex flex-1 flex-col overflow-hidden pt-14 md:pt-0">
+        <div className="p-2 sm:p-4 md:p-8 flex flex-col gap-4 sm:gap-6 flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
           {/* Header Card with Glass Effect */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-[#1E293B] rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm"
+            className="bg-white dark:bg-[#1E293B] rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm"
           >
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-black gradient-text mb-2">
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl md:text-4xl font-black gradient-text mb-1 sm:mb-2 truncate">
                   {activeTab === 'dashboard' && 'Web Analytics'}
                   {activeTab === 'content' && 'Content Management'}
                   {activeTab === 'settings' && 'Settings'}
                 </h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">
                   Welcome back, Admin • {new Date().toLocaleDateString('th-TH', { 
                     weekday: 'long', 
                     year: 'numeric', 
@@ -120,7 +110,7 @@ export function AdminLayout() {
                   })}
                 </p>
               </div>
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 flex-shrink-0">
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                 <span className="text-xs text-muted-foreground">System Online</span>
               </div>
@@ -136,20 +126,7 @@ export function AdminLayout() {
           >
             {activeTab === 'dashboard' && <AnalyticsDashboard />}
             {activeTab === 'content' && <ContentManager />}
-            {activeTab === 'settings' && (
-              <div className="glass rounded-2xl border border-white/20 dark:border-white/10 shadow-xl p-12 flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-blue-500/30">
-                    <svg className="w-10 h-10 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <p className="text-xl font-semibold gradient-text mb-2">Settings</p>
-                  <p className="text-muted-foreground">Coming soon...</p>
-                </div>
-              </div>
-            )}
+            {activeTab === 'settings' && <SettingsManager />}
           </motion.div>
         </div>
       </div>

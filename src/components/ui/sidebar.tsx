@@ -85,18 +85,16 @@ export const DesktopSidebar = ({
   children,
   ...props
 }: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
+  // Floating sidebar with rounded corners, always open
   return (
     <motion.div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-white/60 dark:bg-black/40 backdrop-blur-xl border-r border-white/20 dark:border-white/10 w-[280px] flex-shrink-0 shadow-lg relative z-50",
+        "h-[calc(100%-32px)] m-4 px-4 py-4 hidden md:flex md:flex-col bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-[260px] flex-shrink-0 shadow-xl relative z-50",
         className
       )}
-      animate={{
-        width: animate ? (open ? "280px" : "80px") : "280px",
-      }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       {...props}
     >
       {children}
@@ -111,45 +109,65 @@ export const MobileSidebar = ({
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useSidebar();
   return (
-    <div
-      className={cn(
-        "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-white/60 dark:bg-black/40 backdrop-blur-xl border-b border-white/20 dark:border-white/10 w-full shadow-lg sticky top-0 z-50",
-        className
-      )}
-      {...props}
-    >
-      <div className="flex justify-end z-20 w-full">
-        <IconMenu2
-          className="text-neutral-800 dark:text-neutral-200 cursor-pointer hover:text-primary transition-colors"
-          onClick={() => setOpen(!open)}
-        />
+    <>
+      {/* Fixed Mobile Header Bar */}
+      <div
+        className={cn(
+          "h-14 px-4 flex flex-row md:hidden items-center justify-between bg-white dark:bg-[#0F172A] border-b border-slate-200 dark:border-slate-800 w-full shadow-sm fixed top-0 left-0 right-0 z-[60]",
+          className
+        )}
+        {...props}
+      >
+        <div className="flex items-center gap-3">
+          <IconMenu2
+            className="text-neutral-800 dark:text-neutral-200 cursor-pointer hover:text-primary transition-colors w-6 h-6"
+            onClick={() => setOpen(!open)}
+          />
+          <span className="font-bold text-sm text-foreground">CodeX Admin</span>
+        </div>
       </div>
+      
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "-100%", opacity: 0 }}
-            transition={{
-              duration: 0.3,
-              ease: "easeInOut",
-            }}
-            className={cn(
-              "fixed h-full w-full inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-md p-10 z-[100] flex flex-col justify-center",
-              className
-            )}
-          >
-            <div
-              className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer hover:text-destructive transition-colors"
-              onClick={() => setOpen(!open)}
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-[70] md:hidden"
+              onClick={() => setOpen(false)}
+            />
+            {/* Sidebar Panel */}
+            <motion.div
+              initial={{ x: "-100%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "-100%", opacity: 0 }}
+              transition={{
+                duration: 0.3,
+                ease: "easeInOut",
+              }}
+              className={cn(
+                "fixed top-0 left-0 h-full w-[280px] bg-white dark:bg-[#0F172A] p-6 z-[80] flex flex-col shadow-2xl border-r border-slate-200 dark:border-slate-800",
+                className
+              )}
             >
-              <IconX />
-            </div>
-            {children}
-          </motion.div>
+              <div className="flex items-center justify-between mb-8">
+                <span className="font-bold text-lg gradient-text">CodeX Admin</span>
+                <IconX 
+                  className="text-neutral-800 dark:text-neutral-200 cursor-pointer hover:text-destructive transition-colors w-6 h-6"
+                  onClick={() => setOpen(false)}
+                />
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                {children}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 
@@ -162,29 +180,23 @@ export const SidebarLink = ({
   className?: string;
   props?: LinkProps;
 }) => {
-  const { open, animate } = useSidebar();
+  // Always show label (no animation hide)
   return (
     <Link
       to={link.href}
       className={cn(
-        "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-xl transition-all duration-300 hover:bg-white/50 dark:hover:bg-white/10 hover:shadow-md hover:scale-[1.02]",
+        "flex items-center justify-start gap-3 group/sidebar py-3 px-4 rounded-xl transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:shadow-md hover:scale-[1.02]",
         className
       )}
       {...props}
     >
-      <div className="text-neutral-600 dark:text-neutral-300 group-hover/sidebar:text-primary transition-colors">
+      <div className="text-neutral-600 dark:text-neutral-300 group-hover/sidebar:text-primary transition-colors flex-shrink-0">
         {link.icon}
       </div>
 
-      <motion.span
-        animate={{
-          display: animate ? (open ? "inline-block" : "none") : "inline-block",
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition-transform duration-300"
-      >
+      <span className="text-neutral-700 dark:text-neutral-200 text-sm font-medium group-hover/sidebar:translate-x-1 transition-transform duration-300">
         {link.label}
-      </motion.span>
+      </span>
     </Link>
   );
 };

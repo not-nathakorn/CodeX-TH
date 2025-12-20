@@ -164,22 +164,30 @@ export const MapSettingsManager = () => {
     e.preventDefault();
     if (!editingUniversity) return;
 
+    const updatePayload = {
+      name_th: editingUniversity.name_th,
+      name_en: editingUniversity.name_en,
+      year: editingUniversity.year,
+      degree_level: editingUniversity.degree_level,
+      faculty: editingUniversity.faculty,
+      major: editingUniversity.major,
+      color: editingUniversity.color,
+      logo_url: editingUniversity.logo_url,
+      is_visible: editingUniversity.is_visible
+    };
+
+    console.log('Updating university:', editingUniversity.id);
+    console.log('Payload:', updatePayload);
+
     try {
       setSaving(true);
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from('map_universities')
-        .update({
-          name_th: editingUniversity.name_th,
-          name_en: editingUniversity.name_en,
-          year: editingUniversity.year,
-          degree_level: editingUniversity.degree_level,
-          faculty: editingUniversity.faculty,
-          major: editingUniversity.major,
-          color: editingUniversity.color,
-          logo_url: editingUniversity.logo_url,
-          is_visible: editingUniversity.is_visible
-        })
-        .eq('id', editingUniversity.id);
+        .update(updatePayload)
+        .eq('id', editingUniversity.id)
+        .select();
+
+      console.log('Update result - error:', error, 'data:', data);
 
       if (error) throw error;
 
@@ -209,6 +217,46 @@ export const MapSettingsManager = () => {
     });
   };
 
+  // Auto-save when toggling map visibility
+  const handleToggleMapVisibility = async (checked: boolean) => {
+    setIsVisible(checked);
+    
+    try {
+      const payload = {
+        is_visible: checked,
+        enabled_universities: enabledUniversities,
+        updated_at: new Date().toISOString()
+      };
+
+      let error;
+      
+      if (settings?.id) {
+        const result = await supabase
+          .from('map_settings')
+          .update(payload)
+          .eq('id', settings.id);
+        error = result.error;
+      } else {
+        const result = await supabase
+          .from('map_settings')
+          .insert([payload]);
+        error = result.error;
+      }
+
+      if (error) {
+        console.error('Auto-save error:', error);
+        toast.error('ไม่สามารถบันทึกได้');
+        setIsVisible(!checked); // Revert on error
+      } else {
+        toast.success(checked ? 'เปิดแสดงแผนที่บนเว็บแล้ว' : 'ปิดแสดงแผนที่บนเว็บแล้ว');
+      }
+    } catch (error) {
+      console.error('Auto-save error:', error);
+      toast.error('เกิดข้อผิดพลาด');
+      setIsVisible(!checked); // Revert on error
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -218,37 +266,37 @@ export const MapSettingsManager = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Global Settings */}
       <Card className="bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-700 shadow-sm">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="flex items-center gap-2 text-2xl gradient-text">
-            <Map className="w-6 h-6 text-primary" />
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800 p-3 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-2xl gradient-text">
+            <Map className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             ตั้งค่าแผนที่หลัก
           </CardTitle>
-          <CardDescription className="text-muted-foreground">ควบคุมการแสดงผลภาพรวมของแผนที่</CardDescription>
+          <CardDescription className="text-xs sm:text-sm text-muted-foreground">ควบคุมการแสดงผลภาพรวมของแผนที่</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6 pt-6">
-          <div className="flex items-center justify-between p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50">
-            <div className="space-y-1">
-              <Label htmlFor="map-visible" className="text-lg font-medium text-foreground">
+        <CardContent className="space-y-4 sm:space-y-6 pt-4 sm:pt-6 p-3 sm:p-6">
+          <div className="flex items-center justify-between p-3 sm:p-5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-900/50 gap-4">
+            <div className="space-y-0.5 sm:space-y-1">
+              <Label htmlFor="map-visible" className="text-sm sm:text-lg font-medium text-foreground">
                 แสดงแผนที่บนหน้าเว็บ
               </Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 เปิด/ปิด Section แผนที่ทั้งหมด
               </p>
             </div>
             <Switch
               id="map-visible"
               checked={isVisible}
-              onCheckedChange={setIsVisible}
-              className="data-[state=checked]:bg-primary"
+              onCheckedChange={handleToggleMapVisibility}
+              className="data-[state=checked]:bg-primary flex-shrink-0"
             />
           </div>
 
-          <div className="space-y-4">
-            <Label className="text-lg font-medium text-foreground">เลือกภาคที่ต้องการแสดง</Label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="space-y-3 sm:space-y-4">
+            <Label className="text-sm sm:text-lg font-medium text-foreground">เลือกภาคที่ต้องการแสดง</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {REGIONS.map((region) => {
                 const isSelected = enabledUniversities.includes(region.id);
                 return (
@@ -272,7 +320,7 @@ export const MapSettingsManager = () => {
                       onCheckedChange={() => toggleUniversityEnabled(region.id)}
                       className="border-white/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
-                    <Label htmlFor={region.id} className="cursor-pointer font-medium z-10">
+                    <Label htmlFor={region.id} className="cursor-pointer font-medium z-10 text-foreground">
                       {region.name}
                     </Label>
                     {isSelected && (
@@ -284,11 +332,11 @@ export const MapSettingsManager = () => {
             </div>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex justify-center sm:justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
             <Button 
               onClick={handleSaveSettings} 
               disabled={saving}
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               บันทึกการตั้งค่าหลัก
@@ -299,60 +347,74 @@ export const MapSettingsManager = () => {
 
       {/* University Details */}
       <Card className="bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-700 shadow-sm">
-        <CardHeader className="border-b border-slate-100 dark:border-slate-800">
-          <CardTitle className="text-2xl gradient-text">ข้อมูลมหาวิทยาลัย</CardTitle>
-          <CardDescription className="text-muted-foreground">จัดการข้อมูลรายละเอียดของแต่ละมหาวิทยาลัย</CardDescription>
+        <CardHeader className="border-b border-slate-100 dark:border-slate-800 p-3 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <CardTitle className="text-lg sm:text-2xl gradient-text">ข้อมูลมหาวิทยาลัย</CardTitle>
+              <CardDescription className="text-xs sm:text-sm text-muted-foreground">จัดการข้อมูลรายละเอียดของแต่ละมหาวิทยาลัย</CardDescription>
+            </div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground bg-slate-100 dark:bg-slate-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full self-start sm:self-auto">
+              แสดงบนเว็บ: {enabledUniversities.map(id => REGIONS.find(r => r.id === id)?.name).filter(Boolean).join(', ') || 'ไม่มี'}
+            </div>
+          </div>
         </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {universities.map((uni, index) => (
+        <CardContent className="pt-4 sm:pt-6 p-3 sm:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            {universities.map((uni, index) => {
+              const isRegionEnabled = enabledUniversities.includes(uni.region);
+              return (
               <motion.div 
                 key={uni.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="relative group border border-slate-200 dark:border-slate-700 rounded-2xl p-5 hover:shadow-lg transition-all bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                transition={{ delay: index * 0.05 }}
+                className={`relative group border rounded-xl sm:rounded-2xl p-3 sm:p-5 hover:shadow-lg transition-all bg-white dark:bg-[#1E293B] hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
+                  isRegionEnabled 
+                    ? 'border-slate-200 dark:border-slate-700' 
+                    : 'border-dashed border-slate-300 dark:border-slate-600 opacity-60'
+                }`}
                 style={{ borderLeft: `4px solid ${uni.color}` }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner">
+                <div className="flex justify-between items-start mb-3 sm:mb-4 gap-2">
+                  <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner">
                       {uni.logo_url ? (
-                        <img src={uni.logo_url} alt={uni.name_en} className="w-10 h-10 object-contain" />
+                        <img src={uni.logo_url} alt={uni.name_en} className="w-7 h-7 sm:w-10 sm:h-10 object-contain" />
                       ) : (
-                        <span className="text-xs text-muted-foreground">No Logo</span>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">No Logo</span>
                       )}
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg leading-tight text-foreground">{uni.name_th}</h3>
-                      <p className="text-sm text-muted-foreground">{uni.name_en}</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-sm sm:text-lg leading-tight text-foreground truncate">{uni.name_th}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{uni.name_en}</p>
                     </div>
                   </div>
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       setEditingUniversity(uni);
                       setShowEditDialog(true);
                     }}
-                    className="hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
+                    className="flex-shrink-0 bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 hover:border-blue-500/50 px-2 sm:px-3"
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-4 h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">แก้ไข</span>
                   </Button>
                 </div>
 
-                <div className="space-y-2.5 text-sm">
-                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                <div className="space-y-1.5 sm:space-y-2.5 text-xs sm:text-sm">
+                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 sm:pb-2">
                     <span className="text-muted-foreground">ระดับ:</span>
-                    <span className="font-medium text-foreground">{uni.degree_level}</span>
+                    <span className="font-medium text-foreground truncate ml-2">{uni.degree_level}</span>
                   </div>
-                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                    <span className="text-muted-foreground">คณะ:</span>
-                    <span className="font-medium text-right line-clamp-1 ml-4 text-foreground">{uni.faculty || '-'}</span>
+                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 sm:pb-2">
+                    <span className="text-muted-foreground flex-shrink-0">คณะ:</span>
+                    <span className="font-medium text-right line-clamp-1 ml-2 text-foreground">{uni.faculty || '-'}</span>
                   </div>
-                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                    <span className="text-muted-foreground">สาขา:</span>
-                    <span className="font-medium text-right line-clamp-1 ml-4 text-foreground">{uni.major || '-'}</span>
+                  <div className="flex justify-between border-b border-slate-100 dark:border-slate-800 pb-1.5 sm:pb-2">
+                    <span className="text-muted-foreground flex-shrink-0">สาขา:</span>
+                    <span className="font-medium text-right line-clamp-1 ml-2 text-foreground">{uni.major || '-'}</span>
                   </div>
                   <div className="flex justify-between pt-1">
                     <span className="text-muted-foreground">ปีการศึกษา:</span>
@@ -360,37 +422,44 @@ export const MapSettingsManager = () => {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between">
-                  <Badge 
-                    variant={uni.is_visible ? "default" : "secondary"}
-                    className={uni.is_visible ? "bg-green-500/20 text-green-500 hover:bg-green-500/30 border-0" : "bg-slate-100 dark:bg-slate-800 text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-700 border-0"}
-                  >
-                    {uni.is_visible ? 'แสดงผล' : 'ซ่อน'}
-                  </Badge>
-                  <Badge variant="outline" className="border-white/20 text-muted-foreground">
+                <div className="mt-3 sm:mt-5 flex items-center justify-between flex-wrap gap-1 sm:gap-2">
+                  <div className="flex gap-1 sm:gap-2 flex-wrap">
+                    <Badge 
+                      variant={uni.is_visible ? "default" : "secondary"}
+                      className={`text-[10px] sm:text-xs ${uni.is_visible ? "bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30 border-0" : "bg-slate-100 dark:bg-slate-800 text-muted-foreground hover:bg-slate-200 dark:hover:bg-slate-700 border-0"}`}
+                    >
+                      {uni.is_visible ? 'แสดงผล' : 'ซ่อน'}
+                    </Badge>
+                    {!isRegionEnabled && (
+                      <Badge variant="outline" className="text-[10px] sm:text-xs border-orange-500/50 bg-orange-500/10 text-orange-600 dark:text-orange-400">
+                        ภาคนี้ปิดอยู่
+                      </Badge>
+                    )}
+                  </div>
+                  <Badge variant="outline" className="text-[10px] sm:text-xs border-slate-300 dark:border-slate-600 text-muted-foreground">
                     {uni.region_th}
                   </Badge>
                 </div>
               </motion.div>
-            ))}
+            )})}
           </div>
         </CardContent>
       </Card>
 
       {/* Edit Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-2xl gradient-text">แก้ไขข้อมูลมหาวิทยาลัย</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] bg-white dark:bg-[#1E293B] border-slate-200 dark:border-slate-700 p-4 sm:p-6">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-lg sm:text-2xl gradient-text">แก้ไขข้อมูลมหาวิทยาลัย</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
               ปรับปรุงข้อมูลรายละเอียดสำหรับ {editingUniversity?.name_th}
             </DialogDescription>
           </DialogHeader>
           
           {editingUniversity && (
-            <ScrollArea className="max-h-[60vh] pr-4">
-              <form id="edit-uni-form" onSubmit={handleUpdateUniversity} className="space-y-4 p-1">
-                <div className="grid grid-cols-2 gap-4">
+            <ScrollArea className="max-h-[55vh] sm:max-h-[60vh] pr-2 sm:pr-4">
+              <form id="edit-uni-form" onSubmit={handleUpdateUniversity} className="space-y-3 sm:space-y-4 p-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
                     <Label>ชื่อภาษาไทย</Label>
                     <Input 
@@ -448,9 +517,9 @@ export const MapSettingsManager = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label>สีประจำมหาวิทยาลัย (Hex)</Label>
+                    <Label className="text-sm">สีประจำมหาวิทยาลัย (Hex)</Label>
                     <div className="flex gap-2">
                       <Input 
                         type="color" 
@@ -466,7 +535,7 @@ export const MapSettingsManager = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>URL โลโก้</Label>
+                    <Label className="text-sm">URL โลโก้</Label>
                     <Input 
                       value={editingUniversity.logo_url || ''} 
                       onChange={(e) => setEditingUniversity({...editingUniversity, logo_url: e.target.value})}
@@ -475,22 +544,22 @@ export const MapSettingsManager = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 pt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                <div className="flex items-center space-x-2 p-3 sm:p-4 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                   <Switch
                     id="uni-visible"
                     checked={editingUniversity.is_visible}
                     onCheckedChange={(checked) => setEditingUniversity({...editingUniversity, is_visible: checked})}
                     className="data-[state=checked]:bg-primary"
                   />
-                  <Label htmlFor="uni-visible" className="cursor-pointer">แสดงผลข้อมูลนี้บนแผนที่</Label>
+                  <Label htmlFor="uni-visible" className="cursor-pointer text-sm sm:text-base">แสดงผลข้อมูลนี้บนแผนที่</Label>
                 </div>
               </form>
             </ScrollArea>
           )}
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowEditDialog(false)} className="bg-transparent border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">ยกเลิก</Button>
-            <Button type="submit" form="edit-uni-form" disabled={saving} className="bg-primary hover:bg-primary/90">
+          <DialogFooter className="flex-col sm:flex-row gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowEditDialog(false)} className="w-full sm:w-auto bg-transparent border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">ยกเลิก</Button>
+            <Button type="submit" form="edit-uni-form" disabled={saving} className="w-full sm:w-auto bg-primary hover:bg-primary/90">
               {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               บันทึกการเปลี่ยนแปลง
             </Button>

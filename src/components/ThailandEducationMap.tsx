@@ -172,6 +172,28 @@ const ThailandEducationMap = () => {
     };
 
     fetchUniversities();
+
+    // Realtime Subscription for Universities
+    const channel = supabase
+      .channel('map-universities-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'map_universities'
+        },
+        (payload) => {
+          console.log('Universities data updated:', payload);
+          // Re-fetch all universities when any change occurs
+          fetchUniversities();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Close cards when clicking outside (Global Listener)
@@ -328,7 +350,9 @@ const ThailandEducationMap = () => {
     const group = target.closest('.region-group');
     if (group) {
       const region = group.getAttribute('data-region');
-      if (region) {
+      // Allow hover effect (region float up) for all enabled regions
+      // Connecting lines will check universities separately
+      if (region && enabledUniversities.includes(region)) {
         setHoveredRegion(region);
         return;
       }
@@ -341,7 +365,9 @@ const ThailandEducationMap = () => {
     const group = target.closest('.region-group');
     if (group) {
       const region = group.getAttribute('data-region');
-      if (region) {
+      // Allow click to view region info regardless of university data
+      // Just need to check if the region is enabled
+      if (region && enabledUniversities.includes(region)) {
         e.stopPropagation();
         setSelectedMapRegion(selectedMapRegion === region ? null : region);
         setActiveRegion(null); 
@@ -404,7 +430,7 @@ const ThailandEducationMap = () => {
             
             <AnimatePresence>
               {/* North (CMU) - Top Left */}
-              {(hoveredRegion === 'north' || activeRegion === 'north') && (
+              {enabledUniversities.includes('north') && universities.north && (hoveredRegion === 'north' || activeRegion === 'north') && (
                 <g key="line-north">
                   <motion.line 
                     x1="-25" y1="15" x2="30" y2="20"
@@ -425,7 +451,7 @@ const ThailandEducationMap = () => {
               )}
               
               {/* Northeast (KKU) - Top Right */}
-              {(hoveredRegion === 'northeast' || activeRegion === 'northeast') && (
+              {enabledUniversities.includes('northeast') && universities.northeast && (hoveredRegion === 'northeast' || activeRegion === 'northeast') && (
                 <g key="line-northeast">
                   <motion.line 
                     x1="125" y1="25" x2="70" y2="35"
@@ -446,7 +472,7 @@ const ThailandEducationMap = () => {
               )}
               
               {/* Central (RU) - Middle Right */}
-              {(hoveredRegion === 'central' || activeRegion === 'central') && (
+              {enabledUniversities.includes('central') && universities.central && (hoveredRegion === 'central' || activeRegion === 'central') && (
                 <g key="line-central">
                   <motion.line 
                     x1="125" y1="60" x2="55" y2="55"
@@ -467,7 +493,7 @@ const ThailandEducationMap = () => {
               )}
               
               {/* South (PSU) - Bottom Left */}
-              {(hoveredRegion === 'south' || activeRegion === 'south') && (
+              {enabledUniversities.includes('south') && universities.south && (hoveredRegion === 'south' || activeRegion === 'south') && (
                 <g key="line-south">
                   <motion.line 
                     x1="-25" y1="85" x2="35" y2="80"
@@ -593,18 +619,25 @@ const ThailandEducationMap = () => {
           />
         )}
 
-        {/* Region Info Card (Floating Right) */}
+        {/* Region Info Card (Overlay on Map Region) */}
         <AnimatePresence>
           {selectedMapRegion && (
             <motion.div
-              initial={{ opacity: 0, x: 50, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 50, scale: 0.9 }}
-              className="absolute top-[15%] -right-[75%] w-80 glass-strong p-6 rounded-3xl border border-white/60 shadow-2xl z-50 backdrop-blur-xl bg-white/80"
-              onClick={() => setSelectedMapRegion(null)}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={`absolute w-72 md:w-80 glass-strong p-5 md:p-6 rounded-3xl border border-white/60 shadow-2xl z-50 backdrop-blur-xl bg-white/90 ${
+                // Position in empty space on map (not overlapping any region)
+                selectedMapRegion === 'north' ? 'top-[5%] right-[3%]' :        // Empty space: top-right
+                selectedMapRegion === 'northeast' ? 'top-[35%] left-[3%]' :    // Empty space: mid-left
+                selectedMapRegion === 'central' ? 'bottom-[8%] right-[3%]' :   // Empty space: bottom-right
+                selectedMapRegion === 'south' ? 'bottom-[15%] right-[3%]' :    // Empty space: bottom-right (near south)
+                'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
+              }`}
+              onClick={(e) => e.stopPropagation()}
             >
               <button 
-                className="absolute top-4 right-4 p-2 rounded-full bg-white/50 hover:bg-white text-slate-500 hover:text-red-500 transition-all z-20"
+                className="absolute top-3 right-3 p-2 rounded-full bg-white/50 hover:bg-white text-slate-500 hover:text-red-500 transition-all z-20"
                 onClick={(e) => { e.stopPropagation(); setSelectedMapRegion(null); }}
               >
                 <X size={16} />
@@ -614,18 +647,18 @@ const ThailandEducationMap = () => {
                 <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm mb-3" style={{ background: REGION_THEMES[selectedMapRegion as keyof typeof REGION_THEMES].gradient }}>
                   Selected Region
                 </span>
-                <h3 className="text-3xl font-black mb-2" style={{ color: REGION_THEMES[selectedMapRegion as keyof typeof REGION_THEMES].depth }}>
+                <h3 className="text-2xl md:text-3xl font-black mb-2" style={{ color: REGION_THEMES[selectedMapRegion as keyof typeof REGION_THEMES].depth }}>
                   {REGION_HIGHLIGHTS[selectedMapRegion as keyof typeof REGION_HIGHLIGHTS].title}
                 </h3>
-                <p className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">
+                <p className="text-xs md:text-sm font-semibold text-slate-500 mb-3 md:mb-4 uppercase tracking-wider">
                   {REGION_HIGHLIGHTS[selectedMapRegion as keyof typeof REGION_HIGHLIGHTS].sub}
                 </p>
-                <p className="text-slate-600 leading-relaxed mb-6 text-sm font-medium">
+                <p className="text-slate-600 leading-relaxed mb-4 md:mb-6 text-xs md:text-sm font-medium">
                   {REGION_HIGHLIGHTS[selectedMapRegion as keyof typeof REGION_HIGHLIGHTS].desc}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {REGION_HIGHLIGHTS[selectedMapRegion as keyof typeof REGION_HIGHLIGHTS].tags.map((tag, i) => (
-                    <span key={i} className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-100 shadow-sm">
+                    <span key={i} className="px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-xs font-bold text-slate-600 bg-white border border-slate-100 shadow-sm">
                       #{tag}
                     </span>
                   ))}

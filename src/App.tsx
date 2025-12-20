@@ -9,15 +9,12 @@ import { NavigationDock } from "@/components/NavigationDock";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { AuthGuard } from "@/components/AuthGuard";
 import LazyFallback from "@/components/LazyFallback";
 import React from "react";
 
 // Lazy load pages to improve performance
 import Index from "./pages/Index";
 const AdminLayout = React.lazy(() => import("./pages/AdminLayout").then(module => ({ default: module.AdminLayout })));
-const CallbackPage = React.lazy(() => import("./pages/CallbackPage"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -36,24 +33,16 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <AuthProvider>
-              <AnalyticsTracker />
-              <React.Suspense fallback={<LazyFallback />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/admin" element={
-                    <AuthGuard requiredRole="admin">
-                      <AdminLayout />
-                    </AuthGuard>
-                  } />
-                  <Route path="/callback" element={<CallbackPage />} />
-                  <Route path="/admin/callback" element={<CallbackPage />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </React.Suspense>
-              <NavigationDock />
-            </AuthProvider>
+            <AnalyticsTracker />
+            <React.Suspense fallback={<LazyFallback />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/admin" element={<AdminLayout />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </React.Suspense>
+            <NavigationDock />
           </BrowserRouter>
           <Analytics />
           <SpeedInsights />

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { supabase, Project, Education, Experience, PersonalInfo } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +27,6 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const Admin = () => {
-  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -176,15 +174,7 @@ const Admin = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-100">
-          <button 
-            onClick={logout}
-            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            ออกจากระบบ
-          </button>
-        </div>
+
       </aside>
 
       {/* Main Content */}
