@@ -20,12 +20,12 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
-// Theme colors for status bar (must match index.css background)
-// Light mode uses soft blue to blend with gradient background
-// Dark mode uses deep slate-900
+// Theme colors for status bar (must match website background)
+// Light mode: soft blue to blend with gradient background
+// Dark mode: very dark to match dark theme
 const THEME_COLORS = {
-  light: "#DBEAFE",  // Light blue (matches gradient top - blue-100)
-  dark: "#0f172a",   // Dark mode background (slate-900)
+  light: "#EBF5FF",  // Very light blue (soft, blends with gradient)
+  dark: "#0a0a0a",   // Near black for dark mode
 }
 
 // Update theme-color meta tag for iOS/iPad status bar
