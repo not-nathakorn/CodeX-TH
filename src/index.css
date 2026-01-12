@@ -115,11 +115,11 @@
     content: "";
     position: fixed;
     /* ขยายให้เกินจอทั้งบนและล่าง เพื่อกันขอบขาวเวลา Browser Bar ขยับ */
-    top: -10vh;
+    top: 0;
     left: 0;
     width: 100vw;
-    height: 120vh; /* สูง 120% ของจอ */
-    height: 120dvh;
+    height: 100vh;
+    height: 100dvh;
     z-index: -50;
     
     background: linear-gradient(

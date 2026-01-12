@@ -16,30 +16,27 @@ export function ThemeColorManager() {
       }
 
       // Define colors
-      const lightColor = '#EBF4FF'; // Matches the liquid background base
-      const darkColor = '#0a0a0a';  // Matches neutral-950
+      const lightColor = '#EBF4FF'; // Top status bar color for light mode
+      const darkColor = '#0a0a0a';  // Top status bar color for dark mode
 
       const color = activeTheme === 'dark' ? darkColor : lightColor;
 
-      // Update existing meta tags or invoke specific behavior
-      // Note: modifying meta tags directly might conflict with some hydration, 
-      // but for theme-color it's the standard way.
-      
-      // Update specific light/dark media tags if they exist to force consistency
-      const lightMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: light)"]');
-      const darkMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');
-      
-      if (lightMeta) lightMeta.setAttribute('content', color);
-      if (darkMeta) darkMeta.setAttribute('content', color);
-      
-      // Also update/create a generic one as fallback/primary
-      let genericMeta = document.querySelector('meta[name="theme-color"]:not([media])');
-      if (!genericMeta) {
-        genericMeta = document.createElement('meta');
-        genericMeta.setAttribute('name', 'theme-color');
-        document.head.appendChild(genericMeta);
+      // Aggressively clean up existing meta tags to prevent conflicts
+      const existingMetas = document.querySelectorAll('meta[name="theme-color"]');
+      existingMetas.forEach(meta => {
+        // Remove media attribute to make it unconditional
+        meta.removeAttribute('media');
+        // Update content
+        meta.setAttribute('content', color);
+      });
+
+      // If no tag exists (rare), create one
+      if (existingMetas.length === 0) {
+         const newMeta = document.createElement('meta');
+         newMeta.setAttribute('name', 'theme-color');
+         newMeta.setAttribute('content', color);
+         document.head.appendChild(newMeta);
       }
-      genericMeta.setAttribute('content', color);
     };
 
     updateThemeColor();
