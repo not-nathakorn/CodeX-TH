@@ -130,6 +130,14 @@
     scroll-behavior: smooth;
     overscroll-behavior: none;
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Background color ตรงกับสีด้านบนของ gradient */
+    /* สำคัญ: สีนี้จะแสดงเมื่อ overscroll หรือในพื้นที่ Status Bar */
+    background-color: #EBF5FF; /* hsl(210 40% 98%) */
+  }
+
+  .dark html,
+  html.dark {
+    background-color: #0a0a0a;
   }
 
   /* Scrollbar Styling */

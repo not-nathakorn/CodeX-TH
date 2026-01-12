@@ -102,12 +102,7 @@ const Index = () => {
 
 
   return (
-    <div 
-      className="min-h-screen relative"
-      style={{ 
-        backgroundColor: 'hsl(210 40% 98%)' // Match background for Status Bar area
-      }}
-    >
+    <div className="min-h-screen relative">
       <ModernNavigation />
 
       {/* Hero Section */}
