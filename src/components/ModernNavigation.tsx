@@ -30,7 +30,10 @@ export const ModernNavigation = () => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 md:hidden lg:flex">
+    <div
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 md:hidden lg:flex pt-safe"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
