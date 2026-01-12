@@ -5,8 +5,8 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#EBF4FF",
-  "theme_color": "#EBF4FF",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "icons": [
     {
       "src": "/iOS-Logo-P.png",
