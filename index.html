@@ -14,15 +14,39 @@
           var localTheme = localStorage.getItem('theme');
           var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var html = document.documentElement;
+          var targetColor = '#EBF4FF';
+          var isDark = false;
           
           if (localTheme === 'dark' || (!localTheme && supportDarkMode)) {
             html.classList.add('dark');
             html.style.backgroundColor = '#000000';
+            targetColor = '#000000';
+            isDark = true;
           } else {
             html.classList.remove('dark');
             html.style.backgroundColor = '#EBF4FF';
+            targetColor = '#EBF4FF';
+            isDark = false;
           }
-          // Note: meta theme-color will be updated later or via CSS variables if possible
+          
+          // CRITICAL: Force update theme-color meta for Safari PWA edges
+          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (!metaThemeColor) {
+            metaThemeColor = document.createElement('meta');
+            metaThemeColor.name = 'theme-color';
+            document.head.appendChild(metaThemeColor);
+          }
+          metaThemeColor.content = targetColor;
+          // Remove media attribute to prevent browser from reverting to system preference
+          metaThemeColor.removeAttribute('media');
+
+          // Clean up conflicting meta tags if any (robustness)
+          var allMetas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < allMetas.length; i++) {
+             if (allMetas[i] !== metaThemeColor) {
+               allMetas[i].remove();
+             }
+          }
         } catch (e) {}
       })();
     </script>
