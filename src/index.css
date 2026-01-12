@@ -96,48 +96,47 @@
     transition: none !important;
   }
 
-  body {
-    @apply bg-background text-foreground font-sans;
-    overscroll-behavior: none; /* ปิด Rubber-band effect */
-    overscroll-behavior-y: none; /* ป้องกัน rubber-banding บน iOS */
+  /* Smooth Scroll & Full Height Setup */
+  html {
+    scroll-behavior: smooth;
+    overscroll-behavior: none;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* FIX: ให้ html มี Gradient เดียวกับ Body เพื่อ Status Bar ที่กลมกลืน */
+    height: 100%;
     background: linear-gradient(
       135deg,
       hsl(210 40% 98%) 0%,
       hsl(200 50% 96%) 100%
     );
+    background-attachment: fixed; /* ล็อก background ไม่ให้เลื่อนตาม */
+  }
+
+  /* Body settings */
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100%;
+    overscroll-behavior: none; 
+    overscroll-behavior-y: none;
+    /* ลบ background gradient ที่ซ้ำซ้อนจาก body หรือคงไว้ถ้าจำเป็น แต่ html สำคัญกว่าสำหรับ PWA */
+    background: transparent; /* ให้เห็น background ของ html */
+    
     overflow-x: hidden;
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* PWA Safe Area - รองรับ iPhone Home Indicator (ล่าง/ซ้าย/ขวา) */
-    /* Top จะจัดการโดย Navigation component แทน */
+    /* PWA Safe Area */
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
 
-  /* Smooth Scroll */
-  html {
-    scroll-behavior: smooth;
-    overscroll-behavior: none;
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Background color ตรงกับสีด้านบนของ gradient */
-    /* สำคัญ: สีนี้จะแสดงเมื่อ overscroll หรือในพื้นที่ Status Bar */
-    background-color: #EBF5FF; /* hsl(210 40% 98%) */
-  }
-
-  .dark html,
-  html.dark {
-    background-color: #0a0a0a;
+  .dark html {
+    background: #0a0a0a;
   }
 
   /* Scrollbar Styling */
