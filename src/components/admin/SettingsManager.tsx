@@ -421,7 +421,8 @@ export const SettingsManager = () => {
           <div className="p-4 sm:p-6">
             <AnimatePresence mode="wait">
               {/* Appearance Tab */}
-              <TabsContent value="appearance" className="mt-0">
+              {activeTab === 'appearance' && (
+                <TabsContent value="appearance" key="appearance" className="mt-0">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -485,8 +486,8 @@ export const SettingsManager = () => {
                                   }`}
                                   style={{ 
                                     backgroundColor: color.value,
-                                    ringColor: color.value
-                                  }}
+                                    '--tw-ring-color': color.value
+                                  } as React.CSSProperties}
                                 />
                                 <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
                                   {color.name}
@@ -551,10 +552,12 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
 
               {/* SEO Tab */}
-              <TabsContent value="seo" className="mt-0">
+              {activeTab === 'seo' && (
+                <TabsContent value="seo" key="seo" className="mt-0">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -562,10 +565,12 @@ export const SettingsManager = () => {
                 >
                   <SEOSettingsManager />
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
 
               {/* Profile Tab */}
-              <TabsContent value="profile" className="mt-0 space-y-6">
+              {activeTab === 'profile' && (
+                <TabsContent value="profile" key="profile" className="mt-0 space-y-6">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -690,10 +695,12 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
 
               {/* Security Tab */}
-              <TabsContent value="security" className="mt-0 space-y-6">
+              {activeTab === 'security' && (
+                <TabsContent value="security" key="security" className="mt-0 space-y-6">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -822,10 +829,12 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
 
               {/* Site Settings Tab */}
-              <TabsContent value="site" className="mt-0 space-y-6">
+              {activeTab === 'site' && (
+                <TabsContent value="site" key="site" className="mt-0 space-y-6">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -959,10 +968,12 @@ export const SettingsManager = () => {
                     </Button>
                   </div>
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
 
               {/* Backup Tab */}
-              <TabsContent value="backup" className="mt-0 space-y-6">
+              {activeTab === 'backup' && (
+                <TabsContent value="backup" key="backup" className="mt-0 space-y-6">
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -1058,7 +1069,8 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
                 </motion.div>
-              </TabsContent>
+                </TabsContent>
+              )}
             </AnimatePresence>
           </div>
         </Tabs>
