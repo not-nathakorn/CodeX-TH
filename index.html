@@ -6,6 +6,27 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
+    
+    <!-- Theme Initialization Script (moved to top for instant execution) -->
+    <script>
+      (function() {
+        try {
+          var localTheme = localStorage.getItem('theme');
+          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var html = document.documentElement;
+          
+          if (localTheme === 'dark' || (!localTheme && supportDarkMode)) {
+            html.classList.add('dark');
+            html.style.backgroundColor = '#000000';
+          } else {
+            html.classList.remove('dark');
+            html.style.backgroundColor = '#EBF4FF';
+          }
+          // Note: meta theme-color will be updated later or via CSS variables if possible
+        } catch (e) {}
+      })();
+    </script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -123,24 +144,7 @@
         ]
       }
     </script>
-    <!-- Theme Initialization Script (Prevent Flash of Incorrect Theme) -->
-    <script>
-      (function() {
-        try {
-          var localTheme = localStorage.getItem('theme');
-          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
-          
-          if (localTheme === 'dark' || (!localTheme && supportDarkMode)) {
-            document.documentElement.classList.add('dark');
-            if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000');
-          } else {
-            document.documentElement.classList.remove('dark');
-            if (metaThemeColor) metaThemeColor.setAttribute('content', '#EBF4FF');
-          }
-        } catch (e) {}
-      })();
-    </script>
+
   </head>
 
   <body>
