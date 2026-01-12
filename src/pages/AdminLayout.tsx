@@ -63,7 +63,7 @@ export function AdminLayout() {
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10 bg-white dark:bg-[#0F172A] border-r border-slate-200 dark:border-slate-800">
+        <SidebarBody className="justify-between gap-6 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800 shadow-2xl">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2">
@@ -74,24 +74,28 @@ export function AdminLayout() {
               ))}
             </div>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-slate-800 pt-4">
             <SidebarLink
               link={{
                 label: user?.username || user?.email || "Admin",
                 href: "#",
                 icon: (
-                  <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                  <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-900">
                     {user?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "A"}
                   </div>
                 ),
               }}
+              className="hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200"
             />
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 group w-full",
+                "text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+              )}
             >
-              <IconLogout className="h-4 w-4" />
-              {open && <span>ออกจากระบบ</span>}
+              <IconLogout className="h-5 w-5 shrink-0 transition-transform group-hover:-translate-x-1" />
+              {open && <span className="animate-fade-in whitespace-nowrap">ออกจากระบบ</span>}
             </button>
           </div>
       </SidebarBody>

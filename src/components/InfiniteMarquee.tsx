@@ -80,8 +80,8 @@ export const InfiniteMarquee = () => {
       `}</style>
 
       {/* Gradient Masks */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f0f4f8] dark:from-neutral-950 to-transparent z-20"></div>
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f0f4f8] dark:from-neutral-950 to-transparent z-20"></div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f0f4f8] dark:from-black to-transparent z-20"></div>
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f0f4f8] dark:from-black to-transparent z-20"></div>
       
       {/* First Row - Left Direction */}
       <div className="flex w-max animate-marquee-left relative z-10 will-change-transform">
