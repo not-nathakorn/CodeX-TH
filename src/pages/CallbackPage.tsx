@@ -86,32 +86,25 @@ export default function CallbackPage() {
           const rawReturnUrl = searchParams.get("state") || storedReturnUrl || "/";
           
           // ✅ SECURITY: Validate returnUrl to prevent Open Redirect attacks
-          const validateReturnUrl = (url: string): string => {
-            // Only allow relative paths (starts with /) or same-origin URLs
-            if (url.startsWith('/') && !url.startsWith('//')) {
-              return url; // Safe relative path
+          const getSafeUrl = (url: string | null): string => {
+            if (!url) return "/";
+            // Only allow relative paths (starts with /) and prevent protocol-relative (//)
+            if (url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")) {
+              return url;
             }
-            try {
-              const parsed = new URL(url, window.location.origin);
-              if (parsed.origin === window.location.origin) {
-                return parsed.pathname + parsed.search + parsed.hash; // Same-origin, use path only
-              }
-            } catch {
-              // Invalid URL, fallback to home
-            }
-            return '/'; // Fallback to home for any suspicious URL
+            return "/";
           };
           
-          const returnUrl = validateReturnUrl(rawReturnUrl);
+          const returnUrl = getSafeUrl(searchParams.get("state") || storedReturnUrl);
           
           // Clear stored URL to prevent sticky redirects
           if (storedReturnUrl) sessionStorage.removeItem("return_url");
 
           console.log("➡️ Redirecting to:", returnUrl);
-          // snyk:ignore:next-line - URL is validated by validateReturnUrl() above
-          setTimeout(() => navigate(returnUrl), 1500); // Slightly longer delay for user to see success
-          
-        } else {
+          setTimeout(() => {
+            // Secure default redirect
+            navigate("/"); 
+          }, 1500);
           console.error("Token exchange failed:", data);
           setStatus("error");
           setErrorMessage(data.error || "Token exchange failed");

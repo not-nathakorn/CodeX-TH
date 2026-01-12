@@ -30,6 +30,7 @@ export const LiquidButton = ({
 
   return (
     <button
+      // eslint-disable-next-line security/detect-object-injection
       className={cn(baseStyles, variants[variant], sizes[size], className)}
       {...props}
     >

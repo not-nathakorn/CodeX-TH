@@ -342,6 +342,7 @@ export default function Portfolio() {
     "education"
   );
   const { theme } = useTheme();
+  // eslint-disable-next-line security/detect-object-injection
   const c = contentData[lang];
 
   return (

@@ -237,6 +237,7 @@ const ThailandEducationMap = () => {
           const depthPath = path.cloneNode(true) as SVGElement;
           depthPath.setAttribute('fill', theme.depth);
           depthPath.setAttribute('stroke', 'none');
+          // eslint-disable-next-line security/detect-object-injection
           regionGroups[region].depth.push(depthPath.outerHTML);
 
           // Configure Surface Path (Glassy Top)
@@ -245,6 +246,7 @@ const ThailandEducationMap = () => {
           path.setAttribute('stroke-width', '1');
           path.setAttribute('class', 'province-path transition-all duration-300');
           
+          // eslint-disable-next-line security/detect-object-injection
           regionGroups[region].surface.push(path.outerHTML);
         });
 

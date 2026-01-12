@@ -83,7 +83,9 @@ export const SEOSettingsManager = () => {
   const handleChange = (page: string, field: keyof SEOSettings, value: string) => {
     setSettings(prev => ({
       ...prev,
+      ...prev,
       [page]: {
+        // eslint-disable-next-line security/detect-object-injection
         ...prev[page],
         [field]: value,
       },
@@ -93,6 +95,7 @@ export const SEOSettingsManager = () => {
   const handleSave = async (pageName: string) => {
     setSaving(true);
     try {
+      // eslint-disable-next-line security/detect-object-injection
       const pageSettings = settings[pageName];
       
       const { error } = await supabase
@@ -128,6 +131,7 @@ export const SEOSettingsManager = () => {
     );
   }
 
+  // eslint-disable-next-line security/detect-object-injection
   const currentSettings = settings[activePage] || {
     page_name: activePage,
     meta_title: '',

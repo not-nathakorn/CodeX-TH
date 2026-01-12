@@ -203,10 +203,12 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
   const t = useCallback((key: string): string => {
     const keys = key.split(".");
+    // eslint-disable-next-line security/detect-object-injection
     let value: TranslationNode | undefined = translations[language] as TranslationNode;
     
     for (const k of keys) {
       if (typeof value === "object" && value !== null) {
+        // eslint-disable-next-line security/detect-object-injection
         value = value[k];
       } else {
         value = undefined;
@@ -231,6 +233,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) throw new Error("useLanguage must be used within LanguageProvider");

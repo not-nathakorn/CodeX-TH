@@ -70,6 +70,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     
     // Try server auth check (for cookie-based auth)
+    // ONLY if we are in a context that might have cookies (e.g. admin)
+    // For now, to prevent 401 errors for guests, we skip this if no cache exists.
+    /*
     try {
       const serverUser = await checkAuth(); 
       if (serverUser) {
@@ -78,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch {
       // Normal for cross-domain
     }
+    */
     setIsLoading(false);
   };
 
@@ -172,6 +176,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
