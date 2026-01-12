@@ -121,7 +121,10 @@
 
   /* Body settings */
   body {
-    @apply bg-transparent text-foreground font-sans;
+    @apply text-foreground font-sans;
+    
+    /* CRITICAL: Safari Address Bar uses body background color */
+    background-color: #EBF4FF;
     
     min-height: 100vh;
     min-height: 100dvh;
@@ -132,11 +135,18 @@
     
     overflow-x: hidden;
     
-    transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-    /* PWA Safe Area - Handled in components now for black-translucent support */
-    /* padding-top: env(safe-area-inset-top); REMOVED */
-    /* padding-bottom: env(safe-area-inset-bottom); REMOVED */
+  /* Dark mode body background */
+  html.dark body {
+    background-color: #000000;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #000000;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -299,6 +309,48 @@
 
   .animation-delay-4000 {
     animation-delay: 4s;
+  }
+
+  /* LazyFallback Animations */
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s ease-in-out infinite;
   }
 
   /* ==================== */

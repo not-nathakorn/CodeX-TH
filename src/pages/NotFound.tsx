@@ -21,7 +21,7 @@ const NotFound = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#EBF4FF] dark:bg-black transition-colors duration-500 p-6">
       <div className="max-w-3xl w-full">
         <Card className="glass p-8 text-center shadow-2xl">
           <CardContent>
