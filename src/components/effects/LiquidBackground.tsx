@@ -4,7 +4,7 @@ export const LiquidBackground = () => {
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
       {/* Layer 1: Global Gradient Background (React-controlled for smooth transitions) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#EBF4FF] to-white dark:from-black dark:to-black transition-colors duration-500 ease-in-out" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#EBF4FF] to-[#EBF4FF] dark:from-black dark:to-black transition-colors duration-500 ease-in-out" />
       
       {/* Layer 2: Animated Blobs with Edge Masking */}
       <div className="absolute inset-0" style={{ 
