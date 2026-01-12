@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useTheme } from './theme-provider';
 
 export function ThemeColorManager() {
   const { theme } = useTheme();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateThemeColor = () => {
       // 1. Determine the active theme (light/dark)
       let activeTheme = theme;
@@ -20,17 +20,16 @@ export function ThemeColorManager() {
       const darkColor = '#000000';
       const color = activeTheme === 'dark' ? darkColor : lightColor;
 
-      // 3. Update or Create meta tag for theme-color (Mobile Browsers/PWA)
-      const metaName = 'theme-color';
-      let meta = document.querySelector(`meta[name="${metaName}"]`);
-      
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute('name', metaName);
-        document.head.appendChild(meta);
-      }
-      
-      meta.setAttribute('content', color);
+      // 3. Update meta tag for theme-color (Aggressive replacement for Safari)
+      // Remove ALL existing tags to prevent conflicts or stale values
+      const existingMetas = document.querySelectorAll('meta[name="theme-color"]');
+      existingMetas.forEach(m => m.remove());
+
+      // Create fresh tag
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = color;
+      document.head.appendChild(meta);
 
       // 4. Force HTML background color (Safari Overscroll / Fallback)
       document.documentElement.style.backgroundColor = color;
