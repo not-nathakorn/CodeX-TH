@@ -60,8 +60,8 @@ function generateHTML(width, height) {
   const isLandscape = width > height;
   // Scale logo based on the smaller dimension
   const minDim = Math.min(width, height);
-  const logoSize = Math.floor(minDim * 0.18);
-  const fontSize = Math.floor(minDim * 0.04);
+  const logoSize = Math.floor(minDim * 0.25); // Increased from 0.18 for larger icon
+  const fontSize = Math.floor(minDim * 0.05); // Slightly larger font
   const fromFontSize = Math.floor(fontSize * 0.5);
   const bottomMargin = Math.floor(height * 0.08);
   const lineSpacing = Math.floor(fontSize * 0.3);
@@ -111,15 +111,15 @@ function generateHTML(width, height) {
     
     .from-text {
       font-size: ${fromFontSize}px;
-      color: #9CA3AF;
-      font-weight: 400;
+      color: #6B7280; /* Darker gray for better visibility */
+      font-weight: 500;
       margin-bottom: ${lineSpacing}px;
     }
     
     .brand-name {
       font-size: ${fontSize}px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+      font-weight: 800; /* Extra bold */
+      background: linear-gradient(135deg, #5B21B6 0%, #1E3A8A 100%); /* Much darker purple-blue gradient */
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
