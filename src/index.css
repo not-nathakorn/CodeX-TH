@@ -103,6 +103,7 @@
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     
     height: 100%;
+    min-height: 100dvh; /* สำคัญ: ยืดตามความสูงจริงของ Browser UI */
     /* Gradient หลักอยู่ที่นี่ที่เดียว */
     background: linear-gradient(
       135deg,
