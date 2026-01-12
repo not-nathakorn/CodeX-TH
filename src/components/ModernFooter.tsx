@@ -16,7 +16,7 @@ export const ModernFooter = () => {
   ];
 
   return (
-    <footer className="relative overflow-hidden mb-20 md:mb-0 border-t border-border/30">
+    <footer className="relative overflow-hidden pb-20 md:pb-0 border-t border-border/30" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 5rem)' }}>
       {/* Animated gradient background */}
       <div className="absolute inset-0">
         <motion.div
