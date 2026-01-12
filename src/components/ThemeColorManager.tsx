@@ -29,6 +29,9 @@ export function ThemeColorManager() {
       newMeta.setAttribute('name', 'theme-color');
       newMeta.setAttribute('content', color);
       document.head.appendChild(newMeta);
+
+      // Force update html background color for runtime consistency
+      document.documentElement.style.backgroundColor = color;
     };
 
     updateThemeColor();

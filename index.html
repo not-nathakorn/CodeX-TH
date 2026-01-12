@@ -11,22 +11,30 @@
     <script>
       (function() {
         try {
-          var localTheme = localStorage.getItem('theme');
-          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var localTheme = localStorage.getItem('vite-ui-theme');
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var html = document.documentElement;
           var targetColor = '#EBF4FF';
           var isDark = false;
-          
-          if (localTheme === 'dark' || (!localTheme && supportDarkMode)) {
+
+          // Robust determination of dark mode
+          if (localTheme === 'dark') {
+            isDark = true;
+          } else if (localTheme === 'light') {
+            isDark = false;
+          } else if (systemDark) {
+            // 'system' or null, and system is dark
+            isDark = true;
+          }
+
+          if (isDark) {
             html.classList.add('dark');
             html.style.backgroundColor = '#000000';
             targetColor = '#000000';
-            isDark = true;
           } else {
             html.classList.remove('dark');
             html.style.backgroundColor = '#EBF4FF';
             targetColor = '#EBF4FF';
-            isDark = false;
           }
           
           // CRITICAL: Force update theme-color meta for Safari PWA edges

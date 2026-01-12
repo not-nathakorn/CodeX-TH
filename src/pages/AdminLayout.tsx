@@ -151,7 +151,7 @@ export const Logo = () => {
       className="font-normal flex space-x-3 items-center text-sm py-1 relative z-20"
     >
       <img 
-        src="/Logo.png" 
+        src="/Logo.svg" 
         alt="CodeX Logo" 
         className="h-8 w-8 object-contain rounded-lg"
       />
@@ -173,7 +173,7 @@ export const LogoIcon = () => {
       className="font-normal flex space-x-2 items-center text-sm py-1 relative z-20"
     >
       <img 
-        src="/Logo.png" 
+        src="/Logo.svg" 
         alt="CodeX Logo" 
         className="h-8 w-8 object-contain rounded-lg"
       />
