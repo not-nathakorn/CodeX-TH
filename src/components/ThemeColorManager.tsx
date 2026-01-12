@@ -17,7 +17,7 @@ export function ThemeColorManager() {
       }
 
       const lightColor = '#EBF4FF';
-      const darkColor = '#0a0a0a';
+      const darkColor = '#000000';
       const color = activeTheme === 'dark' ? darkColor : lightColor;
 
       // Update meta tag

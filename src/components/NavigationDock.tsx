@@ -55,7 +55,7 @@ export function NavigationDock() {
     },
   ];
   return (
-    <div className="fixed bottom-4 md:bottom-8 left-0 right-0 z-50 items-center justify-center w-full pointer-events-none hidden md:flex lg:hidden">
+    <div className="fixed bottom-4 md:bottom-8 left-0 right-0 z-50 items-center justify-center w-full pointer-events-none hidden md:flex lg:hidden pb-safe">
       <div className="pointer-events-auto">
         <FloatingDock
           items={links}

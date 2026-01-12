@@ -103,26 +103,13 @@
     height: 100%;
     min-height: 100dvh;
     
-    /* Main Background Gradient - Moved to HTML for native overscroll handling */
-    background-color: #EBF4FF;
-    background-image: linear-gradient(
-      180deg,
-      #EBF4FF 0%,
-      #FFFFFF 100%
-    );
-    background-repeat: no-repeat;
-    background-attachment: scroll; /* Allow overscroll usage */
+    /* Base Color for Overscroll Areas (Top/Bottom) */
+    background-color: #EBF4FF; 
   }
 
-  /* Dark mode gradient */
+  /* Dark mode base color */
   html.dark {
-    /* Use Pure Black for background to ensure bottom overscroll is flawless */
     background-color: #000000;
-    background-image: linear-gradient(
-      180deg,
-      #0a0a0a 0%,
-      #000000 100%
-    );
   }
 
   /* Body settings */
@@ -140,11 +127,9 @@
     
     transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* PWA Safe Area */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+    /* PWA Safe Area - Handled in components now for black-translucent support */
+    /* padding-top: env(safe-area-inset-top); REMOVED */
+    /* padding-bottom: env(safe-area-inset-bottom); REMOVED */
   }
 
   h1, h2, h3, h4, h5, h6 {
