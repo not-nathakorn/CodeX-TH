@@ -117,7 +117,8 @@
   body {
     @apply bg-transparent text-foreground font-sans; /* bg-transparent สำคัญมาก */
     
-    min-height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic Viewport Height - ยืดตาม Address Bar */
     position: relative; /* เพื่อให้เนื้อหาจัดวางได้ถูกต้อง */
     
     overscroll-behavior: none; 

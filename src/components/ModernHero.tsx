@@ -15,13 +15,13 @@ export const ModernHero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex flex-col items-center pt-40 md:pt-44 overflow-hidden pt-safe">
+    <section id="home" className="relative min-h-screen flex flex-col items-center pt-48 md:pt-52 overflow-hidden pt-safe">
       {/* Background Effects */}
       <LiquidBackground />
       <Spotlight className="hidden md:block opacity-50" />
 
-      {/* Content */}
-      <div className="container mx-auto max-w-5xl relative z-10 px-4">
+      {/* Content - z-0 เพื่อให้อยู่ใต้ Navbar (z-50) */}
+      <div className="container mx-auto max-w-5xl relative z-0 px-4">
         <div className="text-center">
           {/* Badge */}
           <motion.div
