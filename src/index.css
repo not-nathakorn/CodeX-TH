@@ -96,38 +96,34 @@
     transition: none !important;
   }
 
-  /* Smooth Scroll & Full Height Setup */
+  /* HTML เป็นตัวจัดการพื้นหลังหลัก เพื่อให้เต็มจอและไม่มีขอบขาว */
   html {
     scroll-behavior: smooth;
     overscroll-behavior: none;
     transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* FIX: ใช้สีพื้นตายตัวที่ตรงกับส่วนบนสุดของ Gradient ป้องกันขอบขาวเวลา Overscroll */
-    background-color: #f8fafc; /* hsl(210 40% 98%) */
     height: 100%;
-  }
-
-  /* Body settings */
-  body {
-    @apply bg-background text-foreground font-sans;
-    
-    /* ใช้ min-height: 100dvh เพื่อให้ยืดเต็มจอจริงๆ บนมือถือ */
-    min-height: 100vh;
-    min-height: 100dvh;
-    
-    overscroll-behavior: none; 
-    overscroll-behavior-y: none;
-    
-    /* ใส่ Gradient ที่นี่แบบปกติ (ไม่ Fixed) เพื่อแก้ปัญหา Safari */
+    /* Gradient หลักอยู่ที่นี่ที่เดียว */
     background: linear-gradient(
       135deg,
       hsl(210 40% 98%) 0%,
       hsl(200 50% 96%) 100%
     );
+    /* ไม่ใช้ fixed เพราะมีปัญหากับ iOS */
+  }
+
+  /* Body โปร่งใส และสูงเต็มจอตาม HTML */
+  body {
+    @apply bg-transparent text-foreground font-sans; /* bg-transparent สำคัญมาก */
+    
+    min-height: 100%;
+    position: relative; /* เพื่อให้เนื้อหาจัดวางได้ถูกต้อง */
+    
+    overscroll-behavior: none; 
+    overscroll-behavior-y: none;
     
     overflow-x: hidden;
-    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* PWA Safe Area */
     padding-bottom: env(safe-area-inset-bottom);

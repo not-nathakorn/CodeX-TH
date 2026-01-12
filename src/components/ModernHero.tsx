@@ -21,7 +21,7 @@ export const ModernHero = () => {
       <Spotlight className="hidden md:block opacity-50" />
 
       {/* Content */}
-      <div className="container mx-auto max-w-5xl relative z-10 flex-grow flex flex-col justify-center px-4">
+      <div className="container mx-auto max-w-5xl relative z-10 flex-grow flex flex-col justify-center px-4 pt-16 md:pt-0">
         <div className="text-center">
           {/* Badge */}
           <motion.div
