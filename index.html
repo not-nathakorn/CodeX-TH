@@ -19,15 +19,22 @@
           var targetColor = "#FFFFFF";
           var isDark = false;
 
-          // Robust determination of dark mode
+          // Robust determination of dark mode - FORCE DEFAULT TO LIGHT
           if (localTheme === "dark") {
             isDark = true;
+          } else {
+            // Default to light mode for new users, ignoring system preference
+            isDark = false;
+          }
+
+          /* 
+          // Previous logic that respected system preference:
           } else if (localTheme === "light") {
             isDark = false;
           } else if (systemDark) {
-            // 'system' or null, and system is dark
             isDark = true;
           }
+          */
 
           if (isDark) {
             html.classList.add("dark");
