@@ -150,7 +150,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     authLogout();
-    setUser(null);
+    // Do NOT set user to null here. It triggers AuthGuard to redirect to login page
+    // before window.location.href="/" has a chance to execute.
+    // setUser(null); 
+    
     accessTokenRef.current = null; // Clear token
     localStorage.removeItem("bb_user_cache");
     window.location.href = "/";

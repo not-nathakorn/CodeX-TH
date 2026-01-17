@@ -102,9 +102,9 @@ export default function CallbackPage() {
 
           console.log("➡️ Redirecting to:", returnUrl);
           setTimeout(() => {
-            // Secure default redirect
-            navigate("/"); 
+            navigate(returnUrl); 
           }, 1500);
+        } else {
           console.error("Token exchange failed:", data);
           setStatus("error");
           setErrorMessage(data.error || "Token exchange failed");
