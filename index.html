@@ -8,22 +8,7 @@
     />
 
     <!-- Theme Initialization Script (moved to top for instant execution) -->
-    <script>
-      // 🚨 FORCE UNREGISTER SERVICE WORKER IMMEDIATELY 🚨
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .getRegistrations()
-          .then(function (registrations) {
-            for (let registration of registrations) {
-              registration.unregister().then(function () {
-                console.log("ServiceWorker unregistered via index.html");
-                // Optional: Force reload if SW was found to ensure clean state
-                // window.location.reload();
-              });
-            }
-          });
-      }
-    </script>
+
     <script>
       (function () {
         try {
