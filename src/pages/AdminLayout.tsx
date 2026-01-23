@@ -24,6 +24,8 @@ export function AdminLayout() {
   const [open, setOpen] = useState(false);
   const [displayName, setDisplayName] = useState<string>('Admin');
 
+
+
   // Fetch display_name from personal_info table
   useEffect(() => {
     const fetchDisplayName = async () => {
@@ -116,11 +118,11 @@ export function AdminLayout() {
             <div onClick={() => setActiveTab('settings')} className="cursor-pointer">
               <SidebarLink
                 link={{
-                  label: displayName || user?.username || "Admin",
+                  label: displayName || user?.first_name || "Admin",
                   href: "#",
                   icon: (
                     <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-900">
-                      {displayName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || "A"}
+                      {displayName?.charAt(0).toUpperCase() || user?.first_name?.charAt(0).toUpperCase() || "A"}
                     </div>
                   ),
                 }}
@@ -154,7 +156,7 @@ export function AdminLayout() {
                   {activeTab === 'settings' && 'Settings'}
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  Welcome back, {user?.username || user?.first_name || 'Admin'} • {new Date().toLocaleDateString('th-TH', { 
+                  Welcome back, {user?.first_name || user?.email?.split('@')[0] || 'Admin'} • {new Date().toLocaleDateString('th-TH', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 

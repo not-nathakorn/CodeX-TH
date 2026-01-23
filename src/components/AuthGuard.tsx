@@ -8,6 +8,7 @@
 
 import { ReactNode } from 'react';
 import { useBBHAuth } from '../hooks/useBBHAuth';
+import LazyFallback from './LazyFallback';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -22,13 +23,11 @@ export function AuthGuard({
 }: AuthGuardProps) {
   const { user, isLoading, login } = useBBHAuth();
 
+
+
   // Show loading state
   if (isLoading) {
-    return fallback || (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return fallback || <LazyFallback message="กำลังยืนยันตัวตน..." />;
   }
 
   // Not authenticated - redirect to login
@@ -46,5 +45,6 @@ export function AuthGuard({
   }
 
   // Authenticated - render children
+
   return <>{children}</>;
 }

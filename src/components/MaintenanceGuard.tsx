@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
 import { useAuth } from "@/contexts/AuthContext";
 import MaintenancePage from "@/pages/MaintenancePage";
-import { Loader2 } from "lucide-react";
+import LazyFallback from "@/components/LazyFallback";
 
 interface MaintenanceGuardProps {
   children: React.ReactNode;
@@ -19,11 +19,7 @@ export const MaintenanceGuard = ({ children }: MaintenanceGuardProps) => {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LazyFallback message="กำลังตรวจสอบระบบ..." />;
   }
 
   if (settings.maintenance_mode) {

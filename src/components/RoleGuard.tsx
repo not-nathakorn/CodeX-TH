@@ -7,6 +7,7 @@
 
 import { ReactNode } from 'react';
 import { useBBHAuth } from '../hooks/useBBHAuth';
+import LazyFallback from './LazyFallback';
 
 interface RoleGuardProps {
   children: ReactNode;
@@ -21,13 +22,11 @@ export function RoleGuard({
 }: RoleGuardProps) {
   const { user, isLoading } = useBBHAuth();
 
+
+
   // Still loading
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LazyFallback message="กำลังตรวจสอบสิทธิ์..." />;
   }
 
   // Not authenticated
@@ -55,5 +54,6 @@ export function RoleGuard({
   }
 
   // Role allowed - render children
+
   return <>{children}</>;
 }
