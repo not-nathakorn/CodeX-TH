@@ -70,6 +70,8 @@ export const ContentManager = () => {
   // DnD State
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeProject = activeId ? projects.find(p => p.id === activeId) : null;
+  const activeEducation = activeId ? education.find(e => e.id === activeId) : null;
+  const activeExperience = activeId ? experience.find(e => e.id === activeId) : null;
 
   // DnD Sensors with activation constraint
   const sensors = useSensors(
@@ -261,7 +263,7 @@ export const ContentManager = () => {
     }
   };
 
-  // Sortable Item Component
+  // Sortable Project Item Component
   const SortableProjectItem = ({ project, index }: { project: Project; index: number }) => {
     const {
       attributes,
@@ -363,6 +365,206 @@ export const ContentManager = () => {
             variant="ghost"
             size="icon"
             onClick={() => setDeleteDialog({ open: true, type: 'projects', id: project.id })}
+            className="hover:bg-red-500/10 hover:text-red-500 hover:scale-110 transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // Sortable Education Item Component
+  const SortableEducationItem = ({ education: edu, index }: { education: Education; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+      isOver,
+    } = useSortable({ id: edu.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200 ${
+          isDragging 
+            ? 'opacity-50 scale-[1.02] shadow-2xl z-50 bg-blue-50 dark:bg-blue-950 border-blue-500 ring-2 ring-blue-500/50' 
+            : isOver
+              ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/50 scale-[1.01]'
+              : edu.is_visible 
+                ? 'bg-white dark:bg-[#1E293B] border-blue-500/30 shadow-sm hover:shadow-md' 
+                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-80'
+        }`}
+      >
+        {/* Drop Indicator Line */}
+        {isOver && !isDragging && (
+          <div className="absolute -top-1 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse" />
+        )}
+
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className={`cursor-grab active:cursor-grabbing p-2 rounded-lg transition-all ${
+            isDragging 
+              ? 'bg-blue-500 text-white' 
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <GripVertical className={`w-5 h-5 ${isDragging ? 'text-white' : 'text-slate-400'}`} />
+        </div>
+
+        <div className="flex items-center gap-4 flex-1">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg border border-blue-500/20 shadow-inner">
+             {index + 1}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className="font-bold text-lg text-foreground">{edu.title_th}</h3>
+              <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5">{edu.year}</Badge>
+              {edu.is_visible && (
+                <Badge variant="default" className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs px-2 py-0.5 h-5 shadow-sm">
+                  Live
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-1">{edu.subtitle_th}</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => toggleVisibility('education', edu.id, edu.is_visible)}
+            className={`hover:scale-110 transition-transform ${edu.is_visible ? "text-green-500 hover:bg-green-500/10" : "text-muted-foreground hover:bg-white/10"}`}
+          >
+            {edu.is_visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setEditingEducation(edu);
+              setShowEducationForm(true);
+            }}
+            className="hover:bg-blue-500/10 hover:text-blue-500 hover:scale-110 transition-all"
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDeleteDialog({ open: true, type: 'education', id: edu.id })}
+            className="hover:bg-red-500/10 hover:text-red-500 hover:scale-110 transition-all"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // Sortable Experience Item Component
+  const SortableExperienceItem = ({ experience: exp, index }: { experience: Experience; index: number }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+      isOver,
+    } = useSortable({ id: exp.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200 ${
+          isDragging 
+            ? 'opacity-50 scale-[1.02] shadow-2xl z-50 bg-blue-50 dark:bg-blue-950 border-blue-500 ring-2 ring-blue-500/50' 
+            : isOver
+              ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/50 scale-[1.01]'
+              : exp.is_visible 
+                ? 'bg-white dark:bg-[#1E293B] border-purple-500/30 shadow-sm hover:shadow-md' 
+                : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-80'
+        }`}
+      >
+        {/* Drop Indicator Line */}
+        {isOver && !isDragging && (
+          <div className="absolute -top-1 left-0 right-0 h-1 bg-blue-500 rounded-full animate-pulse" />
+        )}
+
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className={`cursor-grab active:cursor-grabbing p-2 rounded-lg transition-all ${
+            isDragging 
+              ? 'bg-blue-500 text-white' 
+              : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <GripVertical className={`w-5 h-5 ${isDragging ? 'text-white' : 'text-slate-400'}`} />
+        </div>
+
+        <div className="flex items-center gap-4 flex-1">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold text-lg border border-purple-500/20 shadow-inner">
+             {index + 1}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className="font-bold text-lg text-foreground">{exp.title_th}</h3>
+              <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5">{exp.year}</Badge>
+              {exp.is_visible && (
+                <Badge variant="default" className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs px-2 py-0.5 h-5 shadow-sm">
+                  Live
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground line-clamp-1">{exp.subtitle_th}</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => toggleVisibility('experience', exp.id, exp.is_visible)}
+            className={`hover:scale-110 transition-transform ${exp.is_visible ? "text-green-500 hover:bg-green-500/10" : "text-muted-foreground hover:bg-white/10"}`}
+          >
+            {exp.is_visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setEditingExperience(exp);
+              setShowExperienceForm(true);
+            }}
+            className="hover:bg-blue-500/10 hover:text-blue-500 hover:scale-110 transition-all"
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDeleteDialog({ open: true, type: 'experience', id: exp.id })}
             className="hover:bg-red-500/10 hover:text-red-500 hover:scale-110 transition-all"
           >
             <Trash2 className="w-4 h-4" />
@@ -632,69 +834,54 @@ export const ContentManager = () => {
               Add Education
             </Button>
           </motion.div>
-          <div className="grid gap-4">
-            {education.map((edu, index) => (
-              <motion.div
-                key={edu.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className={`group relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.01] ${
-                  edu.is_visible 
-                    ? 'bg-white dark:bg-[#1E293B] border-blue-500/30 shadow-sm hover:shadow-md' 
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-80'
-                }`}
-              >
-                <div className="flex items-center gap-4 flex-1">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={(event) => handleDragEnd(event, 'education')}
+          >
+            <SortableContext
+              items={education.map(e => e.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="grid gap-4">
+                {education.map((edu, index) => (
+                  <SortableEducationItem key={edu.id} education={edu} index={index} />
+                ))}
+              </div>
+            </SortableContext>
+
+            {/* Drag Overlay for Education */}
+            <DragOverlay>
+              {activeEducation ? (
+                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-[#1E293B] shadow-2xl scale-105 ring-4 ring-blue-500/30">
+                  <div className="p-2 bg-blue-500 rounded-lg">
+                    <GripVertical className="w-5 h-5 text-white" />
+                  </div>
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg border border-blue-500/20 shadow-inner">
-                    {index + 1}
+                    #
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h3 className="font-bold text-lg text-foreground">{edu.title_th}</h3>
-                      <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5">{edu.year}</Badge>
-                      {edu.is_visible && (
-                        <Badge variant="default" className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs px-2 py-0.5 h-5 shadow-sm">
-                          Live
-                        </Badge>
-                      )}
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg text-foreground">{activeEducation.title_th}</h3>
+                      <Badge variant="default" className="bg-blue-500 text-white border-0 text-xs px-2 py-0.5 h-5">
+                        กำลังย้าย...
+                      </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{edu.subtitle_th}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{activeEducation.subtitle_th}</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleVisibility('education', edu.id, edu.is_visible)}
-                    className={`hover:scale-110 transition-transform ${edu.is_visible ? "text-green-500 hover:bg-green-500/10" : "text-muted-foreground hover:bg-white/10"}`}
-                  >
-                    {edu.is_visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEditingEducation(edu);
-                      setShowEducationForm(true);
-                    }}
-                    className="hover:bg-blue-500/10 hover:text-blue-500 hover:scale-110 transition-all"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteDialog({ open: true, type: 'education', id: edu.id })}
-                    className="hover:bg-red-500/10 hover:text-red-500 hover:scale-110 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+          
+          {/* Drag Hint */}
+          {education.length > 1 && (
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-2 mt-4">
+              <GripVertical className="w-4 h-4" />
+              ลากไอคอน ⋮⋮ เพื่อจัดเรียงลำดับ
+            </p>
+          )}
         </TabsContent>
 
         {/* Experience Tab */}
@@ -713,69 +900,54 @@ export const ContentManager = () => {
               Add Experience
             </Button>
           </motion.div>
-          <div className="grid gap-4">
-            {experience.map((exp, index) => (
-              <motion.div
-                key={exp.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className={`group relative flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 hover:scale-[1.01] ${
-                  exp.is_visible 
-                    ? 'bg-white dark:bg-[#1E293B] border-purple-500/30 shadow-sm hover:shadow-md' 
-                    : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-60 hover:opacity-80'
-                }`}
-              >
-                <div className="flex items-center gap-4 flex-1">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={(event) => handleDragEnd(event, 'experience')}
+          >
+            <SortableContext
+              items={experience.map(e => e.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="grid gap-4">
+                {experience.map((exp, index) => (
+                  <SortableExperienceItem key={exp.id} experience={exp} index={index} />
+                ))}
+              </div>
+            </SortableContext>
+
+            {/* Drag Overlay for Experience */}
+            <DragOverlay>
+              {activeExperience ? (
+                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-[#1E293B] shadow-2xl scale-105 ring-4 ring-blue-500/30">
+                  <div className="p-2 bg-blue-500 rounded-lg">
+                    <GripVertical className="w-5 h-5 text-white" />
+                  </div>
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold text-lg border border-purple-500/20 shadow-inner">
-                    {index + 1}
+                    #
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h3 className="font-bold text-lg text-foreground">{exp.title_th}</h3>
-                      <Badge variant="outline" className="text-xs border-primary/20 bg-primary/5">{exp.year}</Badge>
-                      {exp.is_visible && (
-                        <Badge variant="default" className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 text-xs px-2 py-0.5 h-5 shadow-sm">
-                          Live
-                        </Badge>
-                      )}
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg text-foreground">{activeExperience.title_th}</h3>
+                      <Badge variant="default" className="bg-blue-500 text-white border-0 text-xs px-2 py-0.5 h-5">
+                        กำลังย้าย...
+                      </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-1">{exp.subtitle_th}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{activeExperience.subtitle_th}</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleVisibility('experience', exp.id, exp.is_visible)}
-                    className={`hover:scale-110 transition-transform ${exp.is_visible ? "text-green-500 hover:bg-green-500/10" : "text-muted-foreground hover:bg-white/10"}`}
-                  >
-                    {exp.is_visible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEditingExperience(exp);
-                      setShowExperienceForm(true);
-                    }}
-                    className="hover:bg-blue-500/10 hover:text-blue-500 hover:scale-110 transition-all"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeleteDialog({ open: true, type: 'experience', id: exp.id })}
-                    className="hover:bg-red-500/10 hover:text-red-500 hover:scale-110 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+          
+          {/* Drag Hint */}
+          {experience.length > 1 && (
+            <p className="text-xs text-muted-foreground text-center flex items-center justify-center gap-2 mt-4">
+              <GripVertical className="w-4 h-4" />
+              ลากไอคอน ⋮⋮ เพื่อจัดเรียงลำดับ
+            </p>
+          )}
         </TabsContent>
 
         {/* Personal Info Tab */}

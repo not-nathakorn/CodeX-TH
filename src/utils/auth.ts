@@ -11,11 +11,14 @@ const AUTH_HUB = "https://bbh.codex-th.com";
 
 export interface User {
   id: string;
+  blackbox_id?: string;          // B-USR-XXXX (Global)
+  client_id?: string;            // STU-XXXX (Site-Specific)
   username?: string;
   email: string;
   first_name?: string;
   last_name?: string;
-  role?: "client" | "admin" | "end_user" | "child_web_admin";
+  phone?: string;
+  role?: "client" | "admin" | "end_user" | "child_web_admin" | "student" | "teacher";
 }
 
 export interface AuthTokens {

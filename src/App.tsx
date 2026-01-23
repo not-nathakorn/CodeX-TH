@@ -5,8 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGuard } from "@/components/AuthGuard";
+import { RoleGuard } from "@/components/RoleGuard";
+import { BBHAuthProvider } from "@/hooks/useBBHAuth";
 import { NavigationDock } from "@/components/NavigationDock";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -31,6 +32,10 @@ const AnalyticsTracker = () => {
   return null;
 };
 
+import { LiquidBackground } from "@/components/effects/LiquidBackground";
+
+import { MaintenanceGuard } from "@/components/MaintenanceGuard";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
@@ -38,27 +43,37 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <AuthProvider>
+          <BrowserRouter
+            future={{
+              v7_relativeSplatPath: true,
+              v7_startTransition: true,
+            }}
+          >
+            <BBHAuthProvider>
               <ThemeColorManager />
+              <LiquidBackground />
               <AnalyticsTracker />
-              <React.Suspense fallback={<LazyFallback />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  {/* Callback - OAuth redirect handler */}
-                  <Route path="/callback" element={<CallbackPage />} />
-                  {/* Admin Route - Protected with AuthGuard requiring admin role */}
-                  <Route path="/admin" element={
-                    <AuthGuard requiredRole="admin">
-                      <AdminLayout />
-                    </AuthGuard>
-                  } />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </React.Suspense>
-              <NavigationDock />
-            </AuthProvider>
+              <MaintenanceGuard>
+                <React.Suspense fallback={<LazyFallback />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    {/* Callback - OAuth redirect handler */}
+                    <Route path="/callback" element={<CallbackPage />} />
+                    {/* Admin Route - Protected with AuthGuard requiring admin role */}
+                    <Route path="/admin" element={
+                      <AuthGuard>
+                        <RoleGuard allowedRoles={['admin']}>
+                          <AdminLayout />
+                        </RoleGuard>
+                      </AuthGuard>
+                    } />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </React.Suspense>
+                <NavigationDock />
+              </MaintenanceGuard>
+            </BBHAuthProvider>
           </BrowserRouter>
           <Analytics />
           <SpeedInsights />

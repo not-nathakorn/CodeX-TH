@@ -111,41 +111,44 @@ export const PersonalInfoForm = ({ personalInfo, onSave }: PersonalInfoFormProps
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name_th">ชื่อ-นามสกุล (ไทย) *</Label>
+          <Label htmlFor="name_th" className="text-slate-700 dark:text-slate-300">ชื่อ-นามสกุล (ไทย) *</Label>
           <Input
             id="name_th"
             value={formData.name_th}
             onChange={(e) => setFormData({ ...formData, name_th: e.target.value })}
             placeholder="ณฐกร พิกรมสุข"
             required
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="name_en">ชื่อ-นามสกุล (อังกฤษ) *</Label>
+          <Label htmlFor="name_en" className="text-slate-700 dark:text-slate-300">ชื่อ-นามสกุล (อังกฤษ) *</Label>
           <Input
             id="name_en"
             value={formData.name_en}
             onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
             placeholder="Na-thakorn Pikromsuk"
             required
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="nickname">ชื่อเล่น</Label>
+          <Label htmlFor="nickname" className="text-slate-700 dark:text-slate-300">ชื่อเล่น</Label>
           <Input
             id="nickname"
             value={formData.nickname}
             onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
             placeholder="N'Not"
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">อีเมล *</Label>
+          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">อีเมล *</Label>
           <Input
             id="email"
             type="email"
@@ -153,120 +156,131 @@ export const PersonalInfoForm = ({ personalInfo, onSave }: PersonalInfoFormProps
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="contact@codex-th.com"
             required
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="title_th">ตำแหน่ง (ไทย) *</Label>
+          <Label htmlFor="title_th" className="text-slate-700 dark:text-slate-300">ตำแหน่ง (ไทย) *</Label>
           <Input
             id="title_th"
             value={formData.title_th}
             onChange={(e) => setFormData({ ...formData, title_th: e.target.value })}
             placeholder="Full-Stack Developer"
             required
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="title_en">ตำแหน่ง (อังกฤษ) *</Label>
+          <Label htmlFor="title_en" className="text-slate-700 dark:text-slate-300">ตำแหน่ง (อังกฤษ) *</Label>
           <Input
             id="title_en"
             value={formData.title_en}
             onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
             placeholder="Full-Stack Developer"
             required
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio_th">ประวัติย่อ (ไทย)</Label>
+        <Label htmlFor="bio_th" className="text-slate-700 dark:text-slate-300">ประวัติย่อ (ไทย)</Label>
         <Textarea
           id="bio_th"
           value={formData.bio_th}
           onChange={(e) => setFormData({ ...formData, bio_th: e.target.value })}
           rows={3}
           placeholder="นักพัฒนาเว็บและแอปพลิเคชันมือถือ..."
+          className="text-slate-900 dark:text-slate-100"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="bio_en">ประวัติย่อ (อังกฤษ)</Label>
+        <Label htmlFor="bio_en" className="text-slate-700 dark:text-slate-300">ประวัติย่อ (อังกฤษ)</Label>
         <Textarea
           id="bio_en"
           value={formData.bio_en}
           onChange={(e) => setFormData({ ...formData, bio_en: e.target.value })}
           rows={3}
           placeholder="Expert Full Stack Developer..."
+          className="text-slate-900 dark:text-slate-100"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="linkedin_url">LinkedIn URL</Label>
+          <Label htmlFor="linkedin_url" className="text-slate-700 dark:text-slate-300">LinkedIn URL</Label>
           <Input
             id="linkedin_url"
             type="url"
             value={formData.linkedin_url}
             onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
             placeholder="https://linkedin.com/in/..."
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="github_url">GitHub URL</Label>
+          <Label htmlFor="github_url" className="text-slate-700 dark:text-slate-300">GitHub URL</Label>
           <Input
             id="github_url"
             type="url"
             value={formData.github_url}
             onChange={(e) => setFormData({ ...formData, github_url: e.target.value })}
             placeholder="https://github.com/..."
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="line_id">LINE ID</Label>
+          <Label htmlFor="line_id" className="text-slate-700 dark:text-slate-300">LINE ID</Label>
           <Input
             id="line_id"
             value={formData.line_id}
             onChange={(e) => setFormData({ ...formData, line_id: e.target.value })}
             placeholder="nnot.dev"
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="ielts_score">คะแนน IELTS</Label>
+          <Label htmlFor="ielts_score" className="text-slate-700 dark:text-slate-300">คะแนน IELTS</Label>
           <Input
             id="ielts_score"
             value={formData.ielts_score}
             onChange={(e) => setFormData({ ...formData, ielts_score: e.target.value })}
             placeholder="Overall Band 5.5"
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="ielts_validity">ระยะเวลาที่ใช้ได้</Label>
+          <Label htmlFor="ielts_validity" className="text-slate-700 dark:text-slate-300">ระยะเวลาที่ใช้ได้</Label>
           <Input
             id="ielts_validity"
             value={formData.ielts_validity}
             onChange={(e) => setFormData({ ...formData, ielts_validity: e.target.value })}
             placeholder="2024–2026"
+            className="text-slate-900 dark:text-slate-100"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>ทักษะ (Skills)</Label>
+        <Label className="text-slate-700 dark:text-slate-300">ทักษะ (Skills)</Label>
         <div className="flex gap-2">
           <Input
             value={skillInput}
             onChange={(e) => setSkillInput(e.target.value)}
             onKeyPress={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }}
             placeholder="เพิ่มทักษะแล้วกด Enter"
+            className="text-slate-900 dark:text-slate-100"
           />
           <Button type="button" onClick={addSkill}>เพิ่ม</Button>
         </div>

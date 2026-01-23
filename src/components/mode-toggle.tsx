@@ -32,6 +32,7 @@ export function ModeToggle() {
       className={cn(
         "p-2 rounded-full transition-all duration-300",
         "bg-neutral-100/80 dark:bg-neutral-800/80",
+        "text-neutral-800 dark:text-neutral-200",
         "hover:bg-primary/20 hover:text-primary",
         "border border-neutral-200/50 dark:border-neutral-700/50",
         "flex items-center justify-center"

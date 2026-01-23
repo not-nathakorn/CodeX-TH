@@ -1,187 +1,58 @@
 // src/contexts/AuthContext.tsx
-// --------------------------------------------------------
-// BlackBox Auth Provider - PRODUCTION SECURE VERSION
-// ✅ Cross-domain compatible (works when cookies are blocked)
-// ✅ Stores access_token in memory for API calls
-// ✅ User data cached in localStorage for persistence
-// --------------------------------------------------------
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
-import { User, checkAuth, logout as authLogout } from "../utils/auth";
+// ============================================================
+// Auth Context Adapter (BFF Compatibility Layer)
+// ============================================================
+// Adapts the new useBBHAuth hook to the old AuthContext interface
+// so that existing components continue to work without refactoring.
+// ============================================================
 
-interface AuthContextType {
-  user: User | null;
-  role: string | null;
-  isAuthenticated: boolean;
-  login: () => void;
-  loginWithRole: (role: "admin" | "client" | "all") => void;
-  loginForAdmins: () => void;
-  loginForUsers: () => void;
-  logout: () => void;
-  refreshAuth: () => Promise<void>;
-  setUserDirectly: (user: User, accessToken?: string, expiresIn?: number) => void;
-  getAccessToken: () => string | null;
-  isLoading: boolean;
+import { useBBHAuth } from "../hooks/useBBHAuth";
+
+// Re-export User type if needed, or define a compatible one
+export interface User {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  role?: string;
+  blackbox_id?: string;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // 🔐 SECURITY: Store access_token in memory (not localStorage!)
-  const accessTokenRef = useRef<string | null>(null);
-  const expiresAtRef = useRef<number | null>(null);
-
-  const AUTH_URL = import.meta.env.VITE_BLACKBOX_AUTH_URL || "https://bbh.codex-th.com";
-  const CLIENT_ID = import.meta.env.VITE_BLACKBOX_CLIENT_ID;
-  const REDIRECT_URI = import.meta.env.VITE_BLACKBOX_REDIRECT_URI || window.location.origin + "/callback";
-
-  useEffect(() => { 
-    // Skip auth check on callback page (prevents race condition)
-    if (window.location.pathname === "/callback") {
-      setIsLoading(false);
-      return;
-    }
-    initAuth(); 
-  }, []);
-
-  const initAuth = async () => {
-    // Try to restore from localStorage cache first (for page refresh)
-    const cached = localStorage.getItem("bb_user_cache");
-    if (cached) {
-      try {
-        const data = JSON.parse(cached);
-        // Check if session is still valid (using BlackBox's expiry time)
-        if (data.expires_at && Date.now() < data.expires_at) {
-          setUser(data);
-          expiresAtRef.current = data.expires_at;
-          setIsLoading(false);
-          console.log("✅ Session restored from cache, expires:", new Date(data.expires_at));
-          return;
-        } else {
-          // Session expired, clear cache
-          console.log("⏰ Cached session expired");
-          localStorage.removeItem("bb_user_cache");
-        }
-      } catch (e) {
-        localStorage.removeItem("bb_user_cache");
-      }
-    }
-    
-    // Try server auth check (for cookie-based auth)
-    // ONLY if we are in a context that might have cookies (e.g. admin)
-    // For now, to prevent 401 errors for guests, we skip this if no cache exists.
-    /*
-    try {
-      const serverUser = await checkAuth(); 
-      if (serverUser) {
-        setUser(serverUser);
-      }
-    } catch {
-      // Normal for cross-domain
-    }
-    */
-    setIsLoading(false);
-  };
-
-  const refreshAuth = async () => {
-    try {
-      const serverUser = await checkAuth();
-      if (serverUser) setUser(serverUser);
-    } catch {
-      // Ignore refresh errors
-    }
-  };
-
-  // ✅ Set user and token directly from callback
-  // expiresIn is in SECONDS (from BlackBox response)
-  const setUserDirectly = useCallback((
-    userData: User, 
-    accessToken?: string,
-    expiresIn?: number  // seconds
-  ) => {
-    console.log("🔐 setUserDirectly:", userData?.email, "expires_in:", expiresIn);
-    setUser(userData);
-    setIsLoading(false);
-    
-    // Store token in memory for API calls
-    if (accessToken) {
-      accessTokenRef.current = accessToken;
-    }
-    
-    // Calculate expiry timestamp (default 24 hours if not provided)
-    const expiresAt = Date.now() + ((expiresIn || 86400) * 1000);
-    expiresAtRef.current = expiresAt;
-    
-    // Cache user data WITH expiry for page refresh persistence
-    if (userData) {
-      localStorage.setItem("bb_user_cache", JSON.stringify({
-        ...userData,
-        expires_at: expiresAt,  // ✅ Key fix: store expiry time!
-        cached_at: Date.now()
-      }));
-      console.log("💾 Session cached, expires:", new Date(expiresAt));
-    }
-  }, []);
-
-  // ✅ Get access token for API calls
-  const getAccessToken = useCallback(() => {
-    // Check if token is still valid
-    if (expiresAtRef.current && Date.now() >= expiresAtRef.current) {
-      console.log("⏰ Token expired");
-      return null;
-    }
-    return accessTokenRef.current;
-  }, []);
-
-  const login = () => {
-    if (!CLIENT_ID) return console.error("VITE_BLACKBOX_CLIENT_ID missing");
-    window.location.href = `${AUTH_URL}/login?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-  };
-  
-  const loginWithRole = (requiredRole: "admin" | "client" | "all") => {
-    if (!CLIENT_ID) return console.error("VITE_BLACKBOX_CLIENT_ID missing");
-    window.location.href = `${AUTH_URL}/login?client_id=${CLIENT_ID}&required_role=${requiredRole}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-  };
-
-  const loginForAdmins = () => loginWithRole("admin");
-  const loginForUsers = () => loginWithRole("client");
-
-  const logout = () => {
-    authLogout();
-    // Do NOT set user to null here. It triggers AuthGuard to redirect to login page
-    // before window.location.href="/" has a chance to execute.
-    // setUser(null); 
-    
-    accessTokenRef.current = null; // Clear token
-    localStorage.removeItem("bb_user_cache");
-    window.location.href = "/";
-  };
-
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      role: user?.role || null,
-      isAuthenticated: !!user, 
-      login,
-      loginWithRole,
-      loginForAdmins,
-      loginForUsers,
-      logout,
-      refreshAuth,
-      setUserDirectly,
-      getAccessToken, // NEW
-      isLoading 
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  // This component is legacy. The app is wrapped in BBHAuthProvider in App.tsx
+  return <>{children}</>;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+  const { 
+    user, 
+    isAuthenticated, 
+    isLoading, 
+    login, 
+    logout, 
+    refreshUser 
+  } = useBBHAuth();
+
+  // Adapter to match the old interface
+  return {
+    user: user as User | null,
+    role: user?.role || null,
+    isAuthenticated,
+    isLoading,
+    
+    // Auth Actions
+    login: () => login(),
+    loginWithRole: (_role: string) => login(), // Role selection not supported in basic BFF yet
+    loginForAdmins: () => login(),
+    loginForUsers: () => login(),
+    logout: () => logout(),
+    
+    // Refresh
+    refreshAuth: refreshUser,
+    
+    // Legacy / Deprecated methods
+    setUserDirectly: () => console.warn("setUserDirectly is deprecated in BFF mode"),
+    getAccessToken: () => null, // Token is hidden in HttpOnly cookie
+  };
 };

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -13,7 +13,7 @@
         try {
           var localTheme = localStorage.getItem("vite-ui-theme");
           var systemDark = window.matchMedia(
-            "(prefers-color-scheme: dark)"
+            "(prefers-color-scheme: dark)",
           ).matches;
           var html = document.documentElement;
           var targetColor = "#FFFFFF";
@@ -48,7 +48,7 @@
 
           // CRITICAL: Force update theme-color meta for Safari PWA edges
           var metaThemeColor = document.querySelector(
-            'meta[name="theme-color"]'
+            'meta[name="theme-color"]',
           );
           if (!metaThemeColor) {
             metaThemeColor = document.createElement("meta");
@@ -86,8 +86,9 @@
     <meta name="author" content="Na-thakorn Pikromsuk" />
     <meta
       name="keywords"
-      content="Project Hub, Full Stack Developer, Web Development, Mobile App Development, React, Next.js, Thailand Developer, Software Engineer"
+      content="Project Hub, Full Stack Developer, Web Development, Mobile App Development, React, Next.js, Thailand Developer, Software Engineer, Portfolio, CodeX"
     />
+    <link rel="canonical" href="https://codex-th.com/" />
 
     <meta
       property="og:title"
@@ -97,8 +98,10 @@
       property="og:description"
       content="Expert Full Stack Developer specializing in scalable web and mobile applications using React, Next.js, and modern technologies."
     />
+    <meta property="og:url" content="https://codex-th.com/" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/Logo.png" />
+    <meta property="og:image" content="https://codex-th.com/Logo.png" />
+    <meta property="og:site_name" content="Project Hub" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@ProjectHub" />
@@ -110,7 +113,7 @@
       name="twitter:description"
       content="Expert Full Stack Developer specializing in scalable web and mobile applications using React, Next.js, and modern technologies."
     />
-    <meta name="twitter:image" content="/Logo.png" />
+    <meta name="twitter:image" content="https://codex-th.com/Logo.png" />
     <link rel="apple-touch-icon" href="/iOS-Logo-P.png" />
 
     <!-- Theme Color for Status Bar (will be dynamically updated by JS) -->
@@ -125,101 +128,293 @@
     <meta name="apple-mobile-web-app-title" content="Project Hub" />
     <!-- iOS PWA Splash Screens (All Devices) -->
     <!-- iPhone 17 Pro Max/16 Pro Max (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1320-2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1320-2868.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 17 Pro Max/16 Pro Max (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2868-1320.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2868-1320.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 17 Pro/16 Pro (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1260-2736.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1260-2736.png"
+      media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 17 Pro/16 Pro (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2736-1260.png" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2736-1260.png"
+      media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 17 Plus/16 Plus/15 Pro Max (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1290-2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1290-2796.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 17 Plus/16 Plus/15 Pro Max (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2796-1290.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2796-1290.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 16/15 Pro (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1206-2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1206-2622.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 16/15 Pro (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2622-1206.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2622-1206.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 17/16/15/14 Pro (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1179-2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1179-2556.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 17/16/15/14 Pro (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2556-1179.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2556-1179.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 14/13/12 (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1170-2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1170-2532.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 14/13/12 (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2532-1170.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2532-1170.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 14 Plus/13 Pro Max (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1284-2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1284-2778.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 14 Plus/13 Pro Max (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2778-1284.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2778-1284.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 11 Pro Max/XS Max (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1242-2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1242-2688.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 11 Pro Max/XS Max (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2688-1242.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2688-1242.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 11/XR (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-828-1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-828-1792.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPhone 11/XR (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1792-828.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1792-828.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPhone X/XS/11 Pro (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1125-2436.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone X/XS/11 Pro (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2436-1125.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2436-1125.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone 8 Plus (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1242-2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1242-2208.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone 8 Plus (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2208-1242.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2208-1242.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone SE/8/7/6s (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-750-1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-750-1334.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone SE/8/7/6s (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1334-750.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1334-750.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPhone SE 1st/5s (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-640-1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-640-1136.png"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
     <!-- iPhone SE 1st/5s (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1136-640.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1136-640.png"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
     <!-- iPad Pro 13" (M4) (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2064-2752.png" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2064-2752.png"
+      media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Pro 13" (M4) (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2752-2064.png" media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2752-2064.png"
+      media="(device-width: 1032px) and (device-height: 1376px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Pro 11" (M4) (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1668-2420.png" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1668-2420.png"
+      media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Pro 11" (M4) (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2420-1668.png" media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2420-1668.png"
+      media="(device-width: 834px) and (device-height: 1210px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Air 13" (M2) (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2048-2732.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Air 13" (M2) (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2732-2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2732-2048.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Air 11" (M2) (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1640-2360.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1640-2360.png"
+      media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Air 11" (M2) (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2360-1640.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2360-1640.png"
+      media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Pro 12.9" (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2048-2732.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Pro 12.9" (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2732-2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2732-2048.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Pro 11" (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1668-2388.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Pro 11" (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2388-1668.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2388-1668.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad 10.2" (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1620-2160.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1620-2160.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad 10.2" (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2160-1620.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2160-1620.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Air/Mini (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1536-2048.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Air/Mini (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2048-1536.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2048-1536.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Pro 10.5" (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1668-2224.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1668-2224.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Pro 10.5" (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2224-1668.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2224-1668.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Mini 6 (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1488-2266.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1488-2266.png"
+      media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Mini 6 (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2266-1488.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2266-1488.png"
+      media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iPad Air 4/5 (portrait) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-1640-2360.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-1640-2360.png"
+      media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
     <!-- iPad Air 4/5 (landscape) -->
-    <link rel="apple-touch-startup-image" href="/splash/apple-splash-2360-1640.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+    <link
+      rel="apple-touch-startup-image"
+      href="/splash/apple-splash-2360-1640.png"
+      media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
     <!-- iOS PWA Launch Screen Background Color (Critical for avoiding black screen) -->
     <style>
       /* Immediate background color - loads before any external CSS */
@@ -237,7 +432,6 @@
     </style>
 
     <!-- Web App Manifest -->
-
 
     <!-- Structured Data for SEO & Logo -->
     <script type="application/ld+json">
@@ -301,7 +495,8 @@
           backdrop-filter: blur(4px);
           -webkit-backdrop-filter: blur(4px);
           border-radius: 1rem;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          box-shadow:
+            0 20px 25px -5px rgba(0, 0, 0, 0.1),
             0 10px 10px -5px rgba(0, 0, 0, 0.04);
           border: 1px solid rgba(255, 255, 255, 0.2);
           padding: 2rem;

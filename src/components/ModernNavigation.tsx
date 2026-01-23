@@ -117,6 +117,7 @@ export const ModernNavigation = () => {
                 className={cn(
                   "px-2 md:px-3 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300",
                   "bg-neutral-100/80 dark:bg-neutral-800/80",
+                  "text-neutral-800 dark:text-neutral-200",
                   "hover:bg-primary/20 hover:text-primary",
                   "border border-neutral-200/50 dark:border-neutral-700/50",
                   "flex items-center gap-1 md:gap-1.5"

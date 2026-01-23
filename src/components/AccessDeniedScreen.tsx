@@ -60,7 +60,7 @@ export const AccessDeniedScreen: React.FC<AccessDeniedScreenProps> = ({ required
             <Button 
               onClick={() => navigate("/")}
               variant="default"
-              className="w-full bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg"
             >
               <Home className="w-4 h-4 mr-2" />
               Back to Home

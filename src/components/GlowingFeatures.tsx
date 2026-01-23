@@ -61,16 +61,16 @@ const GridItem = ({ area, icon, title, description }: GridItemProps) => {
     <li className={`min-h-[12rem] sm:min-h-[14rem] list-none ${area}`}>
       <div className="relative h-full rounded-2xl p-1 md:rounded-3xl md:p-1">
         <GlowingEffect
-          spread={60}
-          glow={true}
-          disabled={false}
-          proximity={64}
+          spread={30}
+          glow={false}
+          disabled={true}
+          proximity={80}
           inactiveZone={0.01}
-          borderWidth={2}
+          borderWidth={1}
         />
-        <div className="relative flex h-full flex-col justify-between gap-4 md:gap-6 overflow-hidden rounded-xl bg-white p-4 md:p-6 lg:p-8 shadow-sm transition-shadow hover:shadow-md dark:bg-neutral-900 dark:shadow-[0px_0px_27px_0px_#2D2D2D]">
+        <div className="relative flex h-full flex-col justify-between gap-4 md:gap-6 overflow-hidden rounded-2xl bg-neutral-50 dark:bg-neutral-900 p-4 md:p-6 lg:p-8 border border-neutral-200 dark:border-neutral-700/50 shadow-[0_0_15px_rgba(255,255,255,0.03)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
           <div className="relative flex flex-1 flex-col justify-between gap-3 md:gap-4">
-            <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-800">
+            <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800">
               {icon}
             </div>
             <div className="space-y-1 md:space-y-2">

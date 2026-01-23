@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, GraduationCap, Calendar, Award, X } from 'lucide-react';
 import { supabase, MapUniversity } from '@/lib/supabase';
+import DOMPurify from 'dompurify';
 
 
 // Region Highlights Data
@@ -123,6 +124,9 @@ const ThailandEducationMap = () => {
 
     fetchMapSettings();
 
+    // Polling fallback (every 5 seconds) to handle cases where Realtime might disconnect
+    const pollInterval = setInterval(fetchMapSettings, 5000);
+
     // Realtime Subscription
     const channel = supabase
       .channel('map-settings-changes')
@@ -134,7 +138,7 @@ const ThailandEducationMap = () => {
           table: 'map_settings'
         },
         (payload) => {
-          console.log('Map settings updated:', payload);
+          // console.log('Map settings updated:', payload);
           if (payload.new) {
             const newData = payload.new as { is_visible: boolean; enabled_universities: string[] };
             setMapVisible(newData.is_visible);
@@ -146,6 +150,7 @@ const ThailandEducationMap = () => {
 
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
   }, []);
 
@@ -287,7 +292,13 @@ const ThailandEducationMap = () => {
           </svg>
         `;
 
-        setSvgContent(newSvg);
+        const cleanSvg = DOMPurify.sanitize(newSvg, {
+          USE_PROFILES: { svg: true, svgFilters: true },
+          ADD_TAGS: ['use', 'filter', 'feGaussianBlur', 'feComposite', 'defs', 'g', 'path', 'svg'],
+          ADD_ATTR: ['viewBox', 'xmlns', 'style', 'filter', 'id', 'transform', 'class', 'data-region', 'fill', 'stroke', 'stroke-width', 'x', 'y', 'width', 'height', 'stdDeviation', 'result', 'in', 'in2', 'operator'] 
+        });
+
+        setSvgContent(cleanSvg);
       });
   }, []);
 
@@ -387,7 +398,7 @@ const ThailandEducationMap = () => {
 
   return (
     <div 
-      className="w-full py-16 flex flex-col items-center justify-center min-h-[1200px] relative overflow-visible" 
+      className="w-full py-16 flex flex-col items-center justify-center min-h-[900px] relative overflow-visible" 
     >
       
       {/* Background Glows */}
@@ -413,7 +424,7 @@ const ThailandEducationMap = () => {
       </motion.div>
 
       {/* Browser Mockup Container */}
-      <div className="relative w-full max-w-[800px] z-20 perspective-1000">
+      <div className="relative w-full max-w-[650px] z-20 perspective-1000">
         <motion.div 
           initial={{ rotateX: 5 }}
           whileInView={{ rotateX: 0 }}

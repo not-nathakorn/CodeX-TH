@@ -16,7 +16,7 @@ export const ModernFooter = () => {
   ];
 
   return (
-    <footer className="relative overflow-hidden pb-20 md:pb-0 border-t border-border/30" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 5rem)' }}>
+    <footer className="relative overflow-hidden pb-8 md:pb-0 border-t border-border/30" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 1rem)' }}>
       {/* Animated gradient background */}
       <div className="absolute inset-0">
         <motion.div
@@ -38,9 +38,8 @@ export const ModernFooter = () => {
           
           {/* Left: Brand with Sparkles */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 1, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2"
           >
             <motion.div
@@ -66,10 +65,8 @@ export const ModernFooter = () => {
             {stats.map((stat, index) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
+                initial={{ opacity: 1, y: 0 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="relative group"
               >
                 <motion.div
@@ -112,18 +109,15 @@ export const ModernFooter = () => {
 
           {/* Right: Social Icons */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
             className="flex gap-2 md:gap-2.5"
           >
-            {socialLinks.map((social, index) => (
+            {socialLinks.map((social) => (
               <motion.div
                 key={social.name}
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 + index * 0.05, type: "spring" }}
+                initial={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
                 className="relative group"
               >
                 {/* Animated gradient border */}
@@ -154,18 +148,13 @@ export const ModernFooter = () => {
 
         {/* Bottom: Copyright with Full-Width Divider */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
           className="relative mt-4 pt-3"
         >
           {/* Full-width animated divider */}
-          <motion.div
+          <div
             className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
           />
           
           <p className="text-sm md:text-base text-muted-foreground text-center">

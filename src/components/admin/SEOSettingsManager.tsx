@@ -187,41 +187,41 @@ export const SEOSettingsManager = () => {
                   
                   <div className="grid gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="meta_title">Meta Title</Label>
+                      <Label htmlFor="meta_title" className="text-slate-700 dark:text-slate-300">Meta Title</Label>
                       <Input
                         id="meta_title"
                         placeholder="ชื่อหน้าที่จะแสดงใน Search Results"
                         value={currentSettings.meta_title}
                         onChange={(e) => handleChange(page.name, 'meta_title', e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-800"
+                        className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         แนะนำ: 50-60 ตัวอักษร | ปัจจุบัน: {currentSettings.meta_title.length} ตัวอักษร
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="meta_description">Meta Description</Label>
+                      <Label htmlFor="meta_description" className="text-slate-700 dark:text-slate-300">Meta Description</Label>
                       <Textarea
                         id="meta_description"
                         placeholder="คำอธิบายสั้นๆ ที่จะแสดงใน Search Results"
                         value={currentSettings.meta_description}
                         onChange={(e) => handleChange(page.name, 'meta_description', e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-800 min-h-[80px]"
+                        className="bg-slate-50 dark:bg-slate-800 min-h-[80px] text-slate-900 dark:text-slate-100"
                       />
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         แนะนำ: 150-160 ตัวอักษร | ปัจจุบัน: {currentSettings.meta_description.length} ตัวอักษร
                       </p>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="keywords">Keywords (คั่นด้วย comma)</Label>
+                      <Label htmlFor="keywords" className="text-slate-700 dark:text-slate-300">Keywords (คั่นด้วย comma)</Label>
                       <Input
                         id="keywords"
                         placeholder="portfolio, developer, projects, ..."
                         value={currentSettings.keywords}
                         onChange={(e) => handleChange(page.name, 'keywords', e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-800"
+                        className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       />
                     </div>
                   </div>
@@ -236,36 +236,36 @@ export const SEOSettingsManager = () => {
                   
                   <div className="grid gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="og_title">OG Title</Label>
+                      <Label htmlFor="og_title" className="text-slate-700 dark:text-slate-300">OG Title</Label>
                       <Input
                         id="og_title"
                         placeholder="ชื่อที่จะแสดงเมื่อแชร์บน Social Media"
                         value={currentSettings.og_title}
                         onChange={(e) => handleChange(page.name, 'og_title', e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-800"
+                        className="bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="og_description">OG Description</Label>
+                      <Label htmlFor="og_description" className="text-slate-700 dark:text-slate-300">OG Description</Label>
                       <Textarea
                         id="og_description"
                         placeholder="คำอธิบายที่จะแสดงเมื่อแชร์บน Social Media"
                         value={currentSettings.og_description}
                         onChange={(e) => handleChange(page.name, 'og_description', e.target.value)}
-                        className="bg-slate-50 dark:bg-slate-800 min-h-[80px]"
+                        className="bg-slate-50 dark:bg-slate-800 min-h-[80px] text-slate-900 dark:text-slate-100"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="og_image">OG Image URL</Label>
+                      <Label htmlFor="og_image" className="text-slate-700 dark:text-slate-300">OG Image URL</Label>
                       <div className="flex gap-2">
                         <Input
                           id="og_image"
                           placeholder="https://example.com/image.jpg"
                           value={currentSettings.og_image}
                           onChange={(e) => handleChange(page.name, 'og_image', e.target.value)}
-                          className="bg-slate-50 dark:bg-slate-800 flex-1"
+                          className="bg-slate-50 dark:bg-slate-800 flex-1 text-slate-900 dark:text-slate-100"
                         />
                         {currentSettings.og_image && (
                           <div className="h-10 w-10 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
@@ -280,7 +280,7 @@ export const SEOSettingsManager = () => {
                           </div>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         แนะนำขนาด: 1200x630 pixels
                       </p>
                     </div>

@@ -1,49 +1,50 @@
 // src/components/AuthGuard.tsx
-// --------------------------------------------------------
-// Route Guard - Protects authenticated routes
-// --------------------------------------------------------
-import { useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useLocation } from "react-router-dom";
-import { AuthLoadingScreen } from "./AuthLoadingScreen";
-import { AccessDeniedScreen } from "./AccessDeniedScreen";
+// ============================================================
+// Route Protection Component
+// ============================================================
+// Wrap any route with this to require authentication
+// Works with: useBBHAuth hook
+// ============================================================
+
+import { ReactNode } from 'react';
+import { useBBHAuth } from '../hooks/useBBHAuth';
 
 interface AuthGuardProps {
-  children: React.ReactNode;
-  requiredRole?: "client" | "admin";
+  children: ReactNode;
+  fallback?: ReactNode;  // Custom loading component
+  loginRedirect?: string; // Where to redirect after login
 }
 
-export const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
-  const { isAuthenticated, isLoading, login, loginWithRole, role } = useAuth();
-  const location = useLocation();
+export function AuthGuard({ 
+  children, 
+  fallback,
+  loginRedirect 
+}: AuthGuardProps) {
+  const { user, isLoading, login } = useBBHAuth();
 
-  useEffect(() => {
-    // Skip guard logic for callback page
-    if (location.pathname === "/callback") return;
-
-    if (isLoading) return;
-    if (!isAuthenticated) {
-      sessionStorage.setItem("return_url", location.pathname + location.search);
-      
-      if (requiredRole) {
-        loginWithRole(requiredRole);
-      } else {
-        login();
-      }
-    }
-  }, [isAuthenticated, isLoading, login, loginWithRole, location, requiredRole]);
-
-  // Skip guard visual for callback page
-  if (location.pathname === "/callback") return <>{children}</>;
-
-  if (isLoading) return <AuthLoadingScreen message="Checking Access..." subtitle="Please wait while we secure your connection" />;
-
-  // Role check
-  if (isAuthenticated && requiredRole && role !== requiredRole) {
-    return <AccessDeniedScreen requiredRole={requiredRole} />;
+  // Show loading state
+  if (isLoading) {
+    return fallback || (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
-  if (isAuthenticated) return <>{children}</>;
-  
-  return null;
-};
+  // Not authenticated - redirect to login
+  if (!user) {
+    // Use setTimeout to avoid React state update during render
+    setTimeout(() => {
+      login(loginRedirect || window.location.pathname);
+    }, 0);
+    
+    return fallback || (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Redirecting to login...</p>
+      </div>
+    );
+  }
+
+  // Authenticated - render children
+  return <>{children}</>;
+}

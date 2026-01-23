@@ -1,5 +1,9 @@
+import { MAITENANCE_PRESETS, getMaintenanceTranslation } from '@/constants/maintenancePresets';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { clearOldLoginActivity, clearOldSessions } from '@/lib/securityLogger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Loader2, 
   Save, 
@@ -56,7 +59,13 @@ interface SiteSettings {
   contact_email: string;
   maintenance_mode: boolean;
   maintenance_message: string;
+  maintenance_title: string;
+  maintenance_detail: string;
+  maintenance_duration: string;
   google_analytics_id: string;
+  available_for_work: boolean;
+  social_linkedin?: string;
+  social_line?: string;
 }
 
 interface AdminProfile {
@@ -96,7 +105,12 @@ const settingsTabs = [
 ];
 
 export const SettingsManager = () => {
-  const [activeTab, setActiveTab] = useState('appearance');
+  // const { language, setLanguage } = useLanguage();
+  const language = 'th';
+  const setLanguage = (lang: 'th' | 'en') => console.log('Set language:', lang);
+  const { refreshAuth } = useAuth();
+  const [presetLang, setPresetLang] = useState<'th' | 'en'>('th');
+  const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   
@@ -107,7 +121,6 @@ export const SettingsManager = () => {
     }
     return false;
   });
-  const [language, setLanguage] = useState('th');
   const [accentColor, setAccentColor] = useState('#3B82F6');
   
   // Profile states
@@ -129,7 +142,13 @@ export const SettingsManager = () => {
     contact_email: '',
     maintenance_mode: false,
     maintenance_message: 'เว็บไซต์กำลังปรับปรุง กรุณากลับมาใหม่ภายหลัง',
+    maintenance_title: 'Under Maintenance',
+    maintenance_detail: 'ขออภัยในความไม่สะดวก เรากำลังพัฒนาระบบเพื่อให้ดียิ่งขึ้น กรุณากลับมาใหม่ในภายหลัง',
+    maintenance_duration: 'A few hours',
     google_analytics_id: '',
+    available_for_work: true,
+    social_linkedin: '',
+    social_line: '',
   });
   
   // Security states
@@ -146,60 +165,94 @@ export const SettingsManager = () => {
   const loadSettings = async () => {
     setLoading(true);
     try {
-      // Load admin profile
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setProfile({
-          id: user.id,
-          email: user.email || '',
-          display_name: user.user_metadata?.display_name || 'Admin User',
-          avatar_url: user.user_metadata?.avatar_url || '',
-          created_at: user.created_at || new Date().toISOString(),
-        });
+      // Load admin profile from personal_info table (not Supabase Auth)
+      const { data: personalInfo, error: personalInfoError } = await supabase
+        .from('personal_info')
+        .select('id, display_name, updated_at')
+        .limit(1)
+        .maybeSingle();
+      
+      if (personalInfoError) {
+        console.warn('Could not load personal_info:', personalInfoError.message);
       }
+      
+      // Get user info from AuthContext cache
+      const cachedUser = localStorage.getItem('bb_user_cache');
+      let userEmail = 'admin@codex.th';
+      let userId = '';
+      let createdAt = new Date().toISOString();
+      
+      if (cachedUser) {
+        try {
+          const parsed = JSON.parse(cachedUser);
+          userEmail = parsed.email || userEmail;
+          userId = parsed.id || '';
+          createdAt = parsed.cached_at ? new Date(parsed.cached_at).toISOString() : createdAt;
+        } catch (e) {
+          console.warn('Could not parse cached user');
+        }
+      }
+      
+      setProfile({
+        id: personalInfo?.id || userId,
+        email: userEmail,
+        display_name: personalInfo?.display_name || 'Admin User',
+        avatar_url: '', // Not implemented yet
+        created_at: createdAt,
+      });
 
       // Load site settings
       const { data: siteData } = await supabase
         .from('site_settings')
         .select('*')
-        .single();
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
       if (siteData) {
         setSiteSettings(siteData);
       }
 
-      // Load sessions (mock data for now)
-      setSessions([
-        {
-          id: '1',
-          device: 'Desktop',
-          browser: 'Chrome',
-          ip_address: '192.168.1.xxx',
-          location: 'Bangkok, Thailand',
-          created_at: new Date().toISOString(),
-          is_current: true,
-        },
-      ]);
+      // Load active sessions from database
+      const { data: sessionsData, error: sessionsError } = await supabase
+        .from('active_sessions')
+        .select('*')
+        .order('last_active', { ascending: false })
+        .limit(10);
+      
+      if (sessionsError) {
+        console.warn('Could not load sessions:', sessionsError.message);
+      } else if (sessionsData) {
+        setSessions(sessionsData.map(s => ({
+          id: s.id,
+          device: s.device || 'Unknown',
+          browser: s.browser || 'Unknown',
+          ip_address: s.ip_address || 'Unknown',
+          location: s.location || 'Unknown',
+          created_at: s.created_at,
+          is_current: s.is_current || false,
+        })));
+      }
 
-      // Load login history (mock data)
-      setLoginHistory([
-        {
-          id: '1',
-          email: user?.email || 'admin@example.com',
-          status: 'success',
-          ip_address: '192.168.1.xxx',
-          device: 'Desktop - Chrome',
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          email: user?.email || 'admin@example.com',
-          status: 'success',
-          ip_address: '192.168.1.xxx',
-          device: 'Mobile - Safari',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-        },
-      ]);
+      // Load login history from database
+      const { data: historyData, error: historyError } = await supabase
+        .from('login_activity')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      if (historyError) {
+        console.warn('Could not load login history:', historyError.message);
+      } else if (historyData) {
+        setLoginHistory(historyData.map(h => ({
+          id: h.id,
+          email: h.email || 'Unknown',
+          status: (h.status === 'success' ? 'success' : 'failed') as 'success' | 'failed',
+          ip_address: h.ip_address || 'Unknown',
+          device: `${h.device || 'Unknown'} - ${h.browser || 'Unknown'}`,
+          created_at: h.created_at,
+        })));
+      }
 
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -223,27 +276,32 @@ export const SettingsManager = () => {
   };
 
   const handleLanguageChange = (lang: string) => {
-    setLanguage(lang);
+    setLanguage(lang as 'th' | 'en');
     localStorage.setItem('language', lang);
     toast.success(`เปลี่ยนภาษาเป็น ${lang === 'th' ? 'ภาษาไทย' : 'English'}`);
   };
 
-  // Profile handlers
+  // Profile handlers - Save to personal_info table using RPC (bypasses RLS)
   const handleProfileUpdate = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          display_name: profile.display_name,
-          avatar_url: profile.avatar_url,
-        },
+      const { data, error } = await supabase.rpc('update_personal_info', {
+        p_display_name: profile.display_name
       });
 
       if (error) throw error;
+      
+      console.log('Profile updated:', data);
+      
+      // Dispatch event to notify other components (like Sidebar) to refresh
+      window.dispatchEvent(new CustomEvent('displayNameUpdated', { 
+        detail: { displayName: profile.display_name } 
+      }));
+      
       toast.success('อัปเดตโปรไฟล์สำเร็จ!');
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์');
+      toast.error('เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์: ' + (error as Error).message);
     } finally {
       setSaving(false);
     }
@@ -283,19 +341,61 @@ export const SettingsManager = () => {
   const handleSiteSettingsSave = async () => {
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('site_settings')
-        .upsert({
-          id: siteSettings.id || crypto.randomUUID(),
-          ...siteSettings,
-          updated_at: new Date().toISOString(),
+      let settingId = siteSettings.id;
+      
+      // Strict ID check: If we don't have an ID in state, fetch the latest one
+      if (!settingId) {
+         const { data: existing } = await supabase
+           .from('site_settings')
+           .select('id')
+           .order('updated_at', { ascending: false })
+           .limit(1)
+           .maybeSingle();
+           
+         if (existing) {
+           settingId = existing.id;
+         } else {
+           // Only generate new ID if absolutely no record exists
+           settingId = crypto.randomUUID();
+         }
+      }
+
+      // Use RPC for secure update avoiding RLS issues
+      const { data: savedData, error: upsertError } = await supabase
+        .rpc('update_site_settings', {
+          p_id: settingId,
+          p_maintenance_mode: siteSettings.maintenance_mode,
+          p_maintenance_message: siteSettings.maintenance_message,
+          p_maintenance_title: siteSettings.maintenance_title,
+          p_maintenance_detail: siteSettings.maintenance_detail,
+          p_maintenance_duration: siteSettings.maintenance_duration,
+          p_site_name: siteSettings.site_name,
+          p_site_tagline: siteSettings.site_tagline,
+          p_contact_email: siteSettings.contact_email,
+          p_google_analytics_id: siteSettings.google_analytics_id,
+          p_available_for_work: siteSettings.available_for_work,
+          p_social_linkedin: siteSettings.social_linkedin,
+          p_social_line: siteSettings.social_line
         });
 
-      if (error) throw error;
+      console.log('RPC Result Data:', savedData);
+      console.log('RPC Error:', upsertError);
+
+      if (upsertError) throw upsertError;
+      
+      if (!savedData) {
+        throw new Error('No data returned from save operation');
+      }
+
       toast.success('บันทึกการตั้งค่าเว็บไซต์สำเร็จ!');
-    } catch (error) {
-      console.error('Error saving site settings:', error);
-      toast.error('เกิดข้อผิดพลาดในการบันทึก');
+      
+      // Update local state with the returned data (savedData is alrady the object)
+      // Note: RPC returns the JSONB object directly
+      setSiteSettings(savedData as unknown as SiteSettings);
+
+    } catch (err) {
+      console.error('Error saving site settings:', err);
+      toast.error('เกิดข้อผิดพลาดในการบันทึก: ' + (err as Error).message);
     } finally {
       setSaving(false);
     }
@@ -386,17 +486,13 @@ export const SettingsManager = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
+    <div className="space-y-6">
       {/* Settings Navigation */}
       <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Mobile: Horizontal scroll tabs */}
           <div className="border-b border-slate-200 dark:border-slate-700">
-            <TabsList className="w-full h-auto p-1.5 bg-transparent flex flex-nowrap overflow-x-auto gap-1 scrollbar-hide">
+            <TabsList className="w-full h-auto p-1.5 bg-transparent flex justify-start flex-nowrap overflow-x-auto gap-1 scrollbar-hide">
               {settingsTabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -419,15 +515,11 @@ export const SettingsManager = () => {
           </div>
 
           <div className="p-4 sm:p-6">
-            <AnimatePresence mode="wait">
+            <div className="min-h-[400px]">
               {/* Appearance Tab */}
               {activeTab === 'appearance' && (
                 <TabsContent value="appearance" key="appearance" className="mt-0">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in">
                   <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50">
                     <CardHeader className="pb-4 border-b border-slate-100 dark:border-slate-700">
                       <div className="flex items-center gap-3">
@@ -435,15 +527,15 @@ export const SettingsManager = () => {
                           <Palette className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <CardTitle className="text-xl">รูปลักษณ์</CardTitle>
-                          <CardDescription>ปรับแต่งการแสดงผลของเว็บไซต์</CardDescription>
+                          <CardTitle className="text-xl font-bold text-slate-900 dark:text-white">รูปลักษณ์</CardTitle>
+                          <CardDescription className="text-slate-500 dark:text-slate-400 font-medium">ปรับแต่งการแสดงผลของเว็บไซต์</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-6">
                       {/* Theme Mode */}
                       <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">ธีม</Label>
+                        <Label className="text-base font-bold text-slate-800 dark:text-slate-200">ธีม</Label>
                         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                           <div className="flex items-center gap-3">
                             <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-indigo-100 dark:bg-indigo-900' : 'bg-amber-100'}`}>
@@ -454,8 +546,8 @@ export const SettingsManager = () => {
                               )}
                             </div>
                             <div>
-                              <p className="font-medium">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</p>
-                              <p className="text-sm text-muted-foreground">{isDarkMode ? 'ธีมมืดสบายตา' : 'ธีมสว่างชัดเจน'}</p>
+                              <p className="font-bold text-slate-800 dark:text-slate-200">{isDarkMode ? 'Dark Mode' : 'Light Mode'}</p>
+                              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{isDarkMode ? 'ธีมมืดสบายตา' : 'ธีมสว่างชัดเจน'}</p>
                             </div>
                           </div>
                           <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
@@ -464,7 +556,7 @@ export const SettingsManager = () => {
 
                       {/* Accent Color */}
                       <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">สีหลักของเว็บไซต์</Label>
+                        <Label className="text-base font-bold text-slate-800 dark:text-slate-200">สีหลักของเว็บไซต์</Label>
                         <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
                           <div className="flex flex-wrap gap-3">
                             {accentColors.map((color) => (
@@ -489,7 +581,7 @@ export const SettingsManager = () => {
                                     '--tw-ring-color': color.value
                                   } as React.CSSProperties}
                                 />
-                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
                                   {color.name}
                                 </span>
                               </button>
@@ -500,7 +592,7 @@ export const SettingsManager = () => {
 
                       {/* Language */}
                       <div className="space-y-3">
-                        <Label className="text-sm font-semibold text-slate-700 dark:text-slate-300">ภาษา</Label>
+                        <Label className="text-base font-bold text-slate-800 dark:text-slate-200">ภาษา</Label>
                         <div className="grid grid-cols-2 gap-3">
                           <button
                             onClick={() => handleLanguageChange('th')}
@@ -512,8 +604,8 @@ export const SettingsManager = () => {
                           >
                             <span className="text-2xl">🇹🇭</span>
                             <div className="text-left">
-                              <p className="font-medium">ภาษาไทย</p>
-                              <p className="text-xs text-muted-foreground">Thai</p>
+                              <p className="font-bold text-slate-800 dark:text-slate-200">ภาษาไทย</p>
+                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Thai</p>
                             </div>
                             {language === 'th' && (
                               <CheckCircle2 className="w-5 h-5 text-blue-500 ml-auto" />
@@ -529,8 +621,8 @@ export const SettingsManager = () => {
                           >
                             <span className="text-2xl">🇺🇸</span>
                             <div className="text-left">
-                              <p className="font-medium">English</p>
-                              <p className="text-xs text-muted-foreground">English</p>
+                              <p className="font-bold text-slate-800 dark:text-slate-200">English</p>
+                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">English</p>
                             </div>
                             {language === 'en' && (
                               <CheckCircle2 className="w-5 h-5 text-blue-500 ml-auto" />
@@ -551,31 +643,23 @@ export const SettingsManager = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
                 </TabsContent>
               )}
 
               {/* SEO Tab */}
               {activeTab === 'seo' && (
                 <TabsContent value="seo" key="seo" className="mt-0">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in">
                   <SEOSettingsManager />
-                </motion.div>
+                </div>
                 </TabsContent>
               )}
 
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <TabsContent value="profile" key="profile" className="mt-0 space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in space-y-6">
                   {/* Profile Info Card */}
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <CardHeader className="pb-4">
@@ -584,8 +668,8 @@ export const SettingsManager = () => {
                           <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">ข้อมูลส่วนตัว</CardTitle>
-                          <CardDescription>จัดการข้อมูลโปรไฟล์ของคุณ</CardDescription>
+                          <CardTitle className="text-lg text-slate-900 dark:text-slate-100">ข้อมูลส่วนตัว</CardTitle>
+                          <CardDescription className="text-slate-600 dark:text-slate-400">จัดการข้อมูลโปรไฟล์ของคุณ</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -595,34 +679,34 @@ export const SettingsManager = () => {
                           {profile.display_name.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1">
-                          <p className="font-semibold text-lg">{profile.display_name}</p>
-                          <p className="text-sm text-muted-foreground">{profile.email}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            สมาชิกตั้งแต่: {new Date(profile.created_at).toLocaleDateString('th-TH')}
-                          </p>
+                            <p className="font-semibold text-lg text-slate-900 dark:text-slate-100">{profile.display_name}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">{profile.email}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                              สมาชิกตั้งแต่: {new Date(profile.created_at).toLocaleDateString('th-TH')}
+                            </p>
                         </div>
                       </div>
 
                       <div className="grid gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="display_name">Display Name</Label>
+                          <Label htmlFor="display_name" className="text-slate-700 dark:text-slate-300">Display Name</Label>
                           <Input
                             id="display_name"
-                            value={profile.display_name}
+                            value={profile.display_name || ''}
                             onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                            className="bg-white dark:bg-slate-900"
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">Email</Label>
                           <Input
                             id="email"
                             type="email"
-                            value={profile.email}
+                            value={profile.email || ''}
                             disabled
-                            className="bg-slate-100 dark:bg-slate-800 cursor-not-allowed"
+                            className="bg-slate-100 dark:bg-slate-800 cursor-not-allowed text-slate-900 dark:text-slate-100"
                           />
-                          <p className="text-xs text-muted-foreground">Email ไม่สามารถเปลี่ยนได้</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Email ไม่สามารถเปลี่ยนได้</p>
                         </div>
                       </div>
 
@@ -637,75 +721,19 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Change Password Card */}
+                  {/* Change Password Card - Hidden: Uses BlackBox Auth, not Supabase Auth
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/30">
-                          <Key className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">เปลี่ยนรหัสผ่าน</CardTitle>
-                          <CardDescription>อัปเดตรหัสผ่านของคุณ</CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="current_password">รหัสผ่านปัจจุบัน</Label>
-                          <Input
-                            id="current_password"
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="bg-white dark:bg-slate-900"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="new_password">รหัสผ่านใหม่</Label>
-                          <Input
-                            id="new_password"
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="bg-white dark:bg-slate-900"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="confirm_password">ยืนยันรหัสผ่านใหม่</Label>
-                          <Input
-                            id="confirm_password"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="bg-white dark:bg-slate-900"
-                          />
-                        </div>
-                      </div>
-
-                      <Button 
-                        onClick={handlePasswordChange} 
-                        disabled={saving || !newPassword || !confirmPassword}
-                        className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700 text-white"
-                      >
-                        {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Key className="w-4 h-4 mr-2" />}
-                        เปลี่ยนรหัสผ่าน
-                      </Button>
-                    </CardContent>
+                    ... Password change UI hidden ...
                   </Card>
-                </motion.div>
+                  */}
+                </div>
                 </TabsContent>
               )}
 
               {/* Security Tab */}
               {activeTab === 'security' && (
                 <TabsContent value="security" key="security" className="mt-0 space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in space-y-6">
                   {/* Active Sessions Card */}
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <CardHeader className="pb-4">
@@ -715,8 +743,8 @@ export const SettingsManager = () => {
                             <Monitor className="w-5 h-5 text-green-600 dark:text-green-400" />
                           </div>
                           <div>
-                            <CardTitle className="text-lg">อุปกรณ์ที่เข้าสู่ระบบ</CardTitle>
-                            <CardDescription>จัดการ sessions ที่กำลังใช้งาน</CardDescription>
+                            <CardTitle className="text-lg text-slate-900 dark:text-slate-100">อุปกรณ์ที่เข้าสู่ระบบ</CardTitle>
+                            <CardDescription className="text-slate-600 dark:text-slate-400">จัดการ sessions ที่กำลังใช้งาน</CardDescription>
                           </div>
                         </div>
                         <AlertDialog>
@@ -748,30 +776,30 @@ export const SettingsManager = () => {
                         {sessions.map((session) => (
                           <div
                             key={session.id}
-                            className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700"
+                            className="flex flex-col sm:flex-row sm:items-center p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 gap-3"
                           >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                               {session.device === 'Desktop' ? (
-                                <Monitor className="w-8 h-8 text-slate-500" />
+                                <Monitor className="w-6 h-6 sm:w-8 sm:h-8 text-slate-500 flex-shrink-0" />
                               ) : (
-                                <Smartphone className="w-8 h-8 text-slate-500" />
+                                <Smartphone className="w-6 h-6 sm:w-8 sm:h-8 text-slate-500 flex-shrink-0" />
                               )}
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <p className="font-medium">{session.browser} - {session.device}</p>
-                                  {session.is_current && (
-                                    <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full">
-                                      ปัจจุบัน
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                  {session.location} • {session.ip_address}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  <Clock className="w-3 h-3 inline mr-1" />
-                                  {new Date(session.created_at).toLocaleString('th-TH')}
-                                </p>
+                              <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <p className="font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base">{session.browser} - {session.device}</p>
+                                    {session.is_current && (
+                                      <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full whitespace-nowrap">
+                                        ปัจจุบัน
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 line-clamp-1">
+                                    {session.location} • {session.ip_address}
+                                  </p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    <Clock className="w-3 h-3 inline mr-1" />
+                                    {new Date(session.created_at).toLocaleString('th-TH')}
+                                  </p>
                               </div>
                             </div>
                           </div>
@@ -783,14 +811,47 @@ export const SettingsManager = () => {
                   {/* Login History Card */}
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center border border-blue-500/30">
-                          <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center border border-blue-500/30">
+                            <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg text-slate-900 dark:text-slate-100">ประวัติการเข้าสู่ระบบ</CardTitle>
+                            <CardDescription className="text-slate-600 dark:text-slate-400">รายการเข้าสู่ระบบล่าสุด ({loginHistory.length} รายการ)</CardDescription>
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-lg">ประวัติการเข้าสู่ระบบ</CardTitle>
-                          <CardDescription>รายการเข้าสู่ระบบล่าสุด</CardDescription>
-                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-orange-600 border-orange-200 hover:bg-orange-50">
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              ล้างข้อมูลเก่า
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>ล้างประวัติการเข้าสู่ระบบเก่า?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                ลบประวัติที่เก่ากว่า 30 วัน และ sessions ที่ไม่ active เกิน 7 วัน เพื่อประหยัดพื้นที่ฐานข้อมูล
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={async () => {
+                                  const activityDeleted = await clearOldLoginActivity(30);
+                                  const sessionsDeleted = await clearOldSessions(7);
+                                  toast.success(`ลบประวัติ ${activityDeleted} รายการ และ sessions ${sessionsDeleted} รายการ`);
+                                  // Reload settings to refresh the lists
+                                  loadSettings();
+                                }} 
+                                className="bg-orange-600 hover:bg-orange-700"
+                              >
+                                ล้างข้อมูลเก่า
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -798,28 +859,28 @@ export const SettingsManager = () => {
                         {loginHistory.map((history) => (
                           <div
                             key={history.id}
-                            className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700"
+                            className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 gap-2"
                           >
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                               {history.status === 'success' ? (
-                                <CheckCircle2 className="w-6 h-6 text-green-500" />
+                                <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
                               ) : (
-                                <XCircle className="w-6 h-6 text-red-500" />
+                                <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 flex-shrink-0 mt-0.5 sm:mt-0" />
                               )}
-                              <div>
-                                <p className="font-medium">{history.device}</p>
-                                <p className="text-sm text-muted-foreground">{history.ip_address}</p>
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-slate-900 dark:text-slate-100 text-sm sm:text-base truncate">{history.device}</p>
+                                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">{history.ip_address}</p>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            <div className="flex items-center justify-between sm:justify-end sm:flex-col gap-2 pl-8 sm:pl-0 border-t sm:border-t-0 pt-2 sm:pt-0">
+                              <span className={`px-2 py-0.5 text-xs rounded-full whitespace-nowrap ${
                                 history.status === 'success'
                                   ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                                   : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
                               }`}>
                                 {history.status === 'success' ? 'สำเร็จ' : 'ล้มเหลว'}
                               </span>
-                              <p className="text-xs text-muted-foreground mt-1">
+                              <p className="text-xs text-muted-foreground whitespace-nowrap">
                                 {new Date(history.created_at).toLocaleString('th-TH')}
                               </p>
                             </div>
@@ -828,18 +889,14 @@ export const SettingsManager = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </div>
                 </TabsContent>
               )}
 
               {/* Site Settings Tab */}
               {activeTab === 'site' && (
                 <TabsContent value="site" key="site" className="mt-0 space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in space-y-6">
                   {/* General Site Settings */}
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <CardHeader className="pb-4">
@@ -848,42 +905,83 @@ export const SettingsManager = () => {
                           <Building className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">ข้อมูลเว็บไซต์</CardTitle>
-                          <CardDescription>ตั้งค่าข้อมูลพื้นฐานของเว็บไซต์</CardDescription>
+                          <CardTitle className="text-lg text-slate-900 dark:text-slate-100">ข้อมูลเว็บไซต์</CardTitle>
+                          <CardDescription className="text-slate-600 dark:text-slate-400">ตั้งค่าข้อมูลพื้นฐานของเว็บไซต์</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="site_name">ชื่อเว็บไซต์</Label>
+                          <Label htmlFor="site_name" className="text-slate-700 dark:text-slate-300">ชื่อเว็บไซต์</Label>
                           <Input
                             id="site_name"
-                            value={siteSettings.site_name}
+                            value={siteSettings.site_name || ''}
                             onChange={(e) => setSiteSettings({ ...siteSettings, site_name: e.target.value })}
-                            className="bg-white dark:bg-slate-900"
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="site_tagline">Tagline</Label>
+                          <Label htmlFor="site_tagline" className="text-slate-700 dark:text-slate-300">Tagline</Label>
                           <Input
                             id="site_tagline"
-                            value={siteSettings.site_tagline}
+                            value={siteSettings.site_tagline || ''}
                             onChange={(e) => setSiteSettings({ ...siteSettings, site_tagline: e.target.value })}
-                            className="bg-white dark:bg-slate-900"
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                           />
                         </div>
                       </div>
+                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-3">
+                          <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${siteSettings.available_for_work ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-slate-200 dark:bg-slate-800'}`}>
+                            {siteSettings.available_for_work ? (
+                              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                            ) : (
+                              <XCircle className="w-5 h-5 text-slate-500" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-800 dark:text-slate-200">Available for Work</p>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">แสดงสถานะว่าคุณพร้อมรับงานหรือไม่</p>
+                          </div>
+                        </div>
+                        <Switch 
+                          checked={siteSettings.available_for_work} 
+                          onCheckedChange={(checked) => setSiteSettings({ ...siteSettings, available_for_work: checked })} 
+                        />
+                      </div>
                       <div className="space-y-2">
-                        <Label htmlFor="contact_email">Contact Email</Label>
+                        <Label htmlFor="contact_email" className="text-slate-700 dark:text-slate-300">Contact Email</Label>
                         <Input
                           id="contact_email"
                           type="email"
-                          value={siteSettings.contact_email}
+                          value={siteSettings.contact_email || ''}
                           onChange={(e) => setSiteSettings({ ...siteSettings, contact_email: e.target.value })}
-                          className="bg-white dark:bg-slate-900"
+                          className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                           placeholder="contact@example.com"
                         />
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                         <div className="space-y-2">
+                          <Label htmlFor="social_line" className="text-slate-700 dark:text-slate-300">Line URL</Label>
+                          <Input
+                            id="social_line"
+                            value={siteSettings.social_line || ''}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, social_line: e.target.value })}
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                            placeholder="https://line.me/..."
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_linkedin" className="text-slate-700 dark:text-slate-300">LinkedIn URL</Label>
+                          <Input
+                            id="social_linkedin"
+                            value={siteSettings.social_linkedin || ''}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, social_linkedin: e.target.value })}
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                            placeholder="https://linkedin.com/..."
+                          />
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -896,19 +994,19 @@ export const SettingsManager = () => {
                           <ExternalLink className="w-5 h-5 text-green-600 dark:text-green-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">Google Analytics</CardTitle>
-                          <CardDescription>เชื่อมต่อกับ Google Analytics</CardDescription>
+                          <CardTitle className="text-lg text-slate-900 dark:text-slate-100">Google Analytics</CardTitle>
+                          <CardDescription className="text-slate-600 dark:text-slate-400">เชื่อมต่อกับ Google Analytics</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="ga_id">Measurement ID</Label>
+                        <Label htmlFor="ga_id" className="text-slate-700 dark:text-slate-300">Measurement ID</Label>
                         <Input
                           id="ga_id"
-                          value={siteSettings.google_analytics_id}
+                          value={siteSettings.google_analytics_id || ''}
                           onChange={(e) => setSiteSettings({ ...siteSettings, google_analytics_id: e.target.value })}
-                          className="bg-white dark:bg-slate-900"
+                          className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
                           placeholder="G-XXXXXXXXXX"
                         />
                         <p className="text-xs text-muted-foreground">
@@ -932,8 +1030,8 @@ export const SettingsManager = () => {
                           }`} />
                         </div>
                         <div className="flex-1">
-                          <CardTitle className="text-lg">Maintenance Mode</CardTitle>
-                          <CardDescription>ปิดเว็บไซต์ชั่วคราวเพื่อปรับปรุง</CardDescription>
+                          <CardTitle className="text-lg text-slate-900 dark:text-slate-100">Maintenance Mode</CardTitle>
+                          <CardDescription className="text-slate-600 dark:text-slate-400">ปิดเว็บไซต์ชั่วคราวเพื่อปรับปรุง</CardDescription>
                         </div>
                         <Switch
                           checked={siteSettings.maintenance_mode}
@@ -942,15 +1040,111 @@ export const SettingsManager = () => {
                       </div>
                     </CardHeader>
                     {siteSettings.maintenance_mode && (
-                      <CardContent>
-                        <div className="space-y-2">
-                          <Label htmlFor="maintenance_message">ข้อความแจ้งผู้ใช้</Label>
+                      <CardContent className="space-y-4">
+                        <div className="flex justify-end space-x-2 mb-4">
+                          <span className="text-sm text-slate-500 flex items-center">Preset Language:</span>
+                          <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                            <button
+                              onClick={() => setPresetLang('th')}
+                              className={`px-3 py-1 text-xs rounded-md transition-all ${presetLang === 'th' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                            >
+                              ไทย
+                            </button>
+                            <button
+                              onClick={() => setPresetLang('en')}
+                              className={`px-3 py-1 text-xs rounded-md transition-all ${presetLang === 'en' ? 'bg-white dark:bg-slate-700 shadow text-blue-600 dark:text-blue-400 font-medium' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                            >
+                              English
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <Label htmlFor="maintenance_title" className="text-slate-700 dark:text-slate-300">Title</Label>
                           <Input
-                            id="maintenance_message"
-                            value={siteSettings.maintenance_message}
-                            onChange={(e) => setSiteSettings({ ...siteSettings, maintenance_message: e.target.value })}
-                            className="bg-white dark:bg-slate-900"
+                            id="maintenance_title"
+                            value={siteSettings.maintenance_title || ''}
+                            onChange={(e) => setSiteSettings({ ...siteSettings, maintenance_title: e.target.value })}
+                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                            placeholder="Under Maintenance"
                           />
+                          <div className="flex flex-wrap gap-2">
+                            {MAITENANCE_PRESETS.titles.map((item) => (
+                              <button
+                                key={item.en}
+                                onClick={() => setSiteSettings({ ...siteSettings, maintenance_title: presetLang === 'en' ? item.en : item.th })}
+                                className="px-3 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                              >
+                              {presetLang === 'en' ? item.en : item.th}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+  
+                          <div className="space-y-4">
+                            <Label htmlFor="maintenance_message" className="text-slate-700 dark:text-slate-300">Message</Label>
+                            <Input
+                              id="maintenance_message"
+                              value={siteSettings.maintenance_message || ''}
+                              onChange={(e) => setSiteSettings({ ...siteSettings, maintenance_message: e.target.value })}
+                              className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                              placeholder="Website is under maintenance..."
+                            />
+                            <div className="flex flex-wrap gap-2">
+                              {MAITENANCE_PRESETS.messages.map((item) => (
+                                <button
+                                  key={item.en}
+                                  onClick={() => setSiteSettings({ ...siteSettings, maintenance_message: presetLang === 'en' ? item.en : item.th })}
+                                  className="px-3 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                                >
+                                  {presetLang === 'en' ? item.en : item.th}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+  
+                          <div className="space-y-4">
+                            <Label htmlFor="maintenance_detail" className="text-slate-700 dark:text-slate-300">Detail</Label>
+                            <Input
+                              id="maintenance_detail"
+                              value={siteSettings.maintenance_detail || ''}
+                              onChange={(e) => setSiteSettings({ ...siteSettings, maintenance_detail: e.target.value })}
+                              className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                              placeholder="We apologize for the inconvenience..."
+                            />
+                             <div className="flex flex-wrap gap-2">
+                              {MAITENANCE_PRESETS.details.map((item) => (
+                                <button
+                                  key={item.en}
+                                  onClick={() => setSiteSettings({ ...siteSettings, maintenance_detail: presetLang === 'en' ? item.en : item.th })}
+                                  className="px-3 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                                >
+                                  {presetLang === 'en' ? item.en : item.th}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+  
+                          <div className="space-y-4">
+                            <Label htmlFor="maintenance_duration" className="text-slate-700 dark:text-slate-300">Estimated Duration</Label>
+                            <Input
+                              id="maintenance_duration"
+                              value={siteSettings.maintenance_duration || ''}
+                              onChange={(e) => setSiteSettings({ ...siteSettings, maintenance_duration: e.target.value })}
+                              className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                              placeholder="A few hours"
+                            />
+                            <div className="flex flex-wrap gap-2">
+                              {MAITENANCE_PRESETS.durations.map((item) => (
+                                <button
+                                  key={item.en}
+                                  onClick={() => setSiteSettings({ ...siteSettings, maintenance_duration: presetLang === 'en' ? item.en : item.th })}
+                                  className="px-3 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-600 dark:hover:text-blue-400 transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+                                >
+                                  {presetLang === 'en' ? item.en : item.th}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </CardContent>
                     )}
@@ -967,18 +1161,14 @@ export const SettingsManager = () => {
                       บันทึกการตั้งค่า
                     </Button>
                   </div>
-                </motion.div>
+                </div>
                 </TabsContent>
               )}
 
               {/* Backup Tab */}
               {activeTab === 'backup' && (
                 <TabsContent value="backup" key="backup" className="mt-0 space-y-6">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
+                <div className="animate-fade-in space-y-6">
                   {/* Export Data Card */}
                   <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                     <CardHeader className="pb-4">
@@ -987,8 +1177,8 @@ export const SettingsManager = () => {
                           <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">ส่งออกข้อมูล</CardTitle>
-                          <CardDescription>ดาวน์โหลดข้อมูลทั้งหมดในรูปแบบที่ต้องการ</CardDescription>
+                          <CardTitle className="text-lg text-slate-900 dark:text-slate-100">ส่งออกข้อมูล</CardTitle>
+                          <CardDescription className="text-slate-600 dark:text-slate-400">ดาวน์โหลดข้อมูลทั้งหมดในรูปแบบที่ต้องการ</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -1002,8 +1192,8 @@ export const SettingsManager = () => {
                           <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <span className="text-2xl">📦</span>
                           </div>
-                          <p className="font-semibold">Export as JSON</p>
-                          <p className="text-sm text-muted-foreground">ดาวน์โหลดข้อมูลครบถ้วนในรูปแบบ JSON</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">Export as JSON</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">ดาวน์โหลดข้อมูลครบถ้วนในรูปแบบ JSON</p>
                         </button>
                         <button
                           onClick={() => handleExportData('csv')}
@@ -1013,8 +1203,8 @@ export const SettingsManager = () => {
                           <div className="h-12 w-12 rounded-xl bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <span className="text-2xl">📊</span>
                           </div>
-                          <p className="font-semibold">Export as CSV</p>
-                          <p className="text-sm text-muted-foreground">ดาวน์โหลดโปรเจกต์ในรูปแบบ CSV</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">Export as CSV</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">ดาวน์โหลดโปรเจกต์ในรูปแบบ CSV</p>
                         </button>
                       </div>
                       {exporting && (
@@ -1026,55 +1216,14 @@ export const SettingsManager = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Reset Settings Card */}
-                  <Card className="border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center border border-red-500/30">
-                          <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg text-red-700 dark:text-red-400">Danger Zone</CardTitle>
-                          <CardDescription className="text-red-600/70 dark:text-red-400/70">
-                            การดำเนินการเหล่านี้ไม่สามารถย้อนกลับได้
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-col sm:flex-row gap-3">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950">
-                              <RefreshCw className="w-4 h-4 mr-2" />
-                              Reset to Defaults
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>รีเซ็ตการตั้งค่าทั้งหมด?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                การดำเนินการนี้จะรีเซ็ตการตั้งค่าทั้งหมดกลับเป็นค่าเริ่มต้น ข้อมูลเนื้อหาจะไม่ถูกลบ
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>ยกเลิก</AlertDialogCancel>
-                              <AlertDialogAction className="bg-red-600 hover:bg-red-700">
-                                รีเซ็ต
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
+
+                </div>
                 </TabsContent>
               )}
-            </AnimatePresence>
+            </div>
           </div>
         </Tabs>
       </div>
-    </motion.div>
+    </div>
   );
 };

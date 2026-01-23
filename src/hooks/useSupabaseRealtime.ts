@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { SiteSettings } from '@/types/database.types';
 
 /**
  * Custom hook for subscribing to Supabase Realtime changes
@@ -26,27 +27,37 @@ export function useSupabaseRealtime<T>(
   const [isConnected, setIsConnected] = useState(false);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
+  // Use a ref to track the latest onUpdate callback
+  // This prevents the subscription effect from re-running when the callback function identity changes
+  const onUpdateRef = useRef(onUpdate);
+
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
+
   useEffect(() => {
     if (!enabled) return;
 
     const channelName = `realtime-${tableName}-${Date.now()}`;
     
-    const subscription = supabase
-      .channel(channelName)
+    // Explicitly create the channel first
+    const channelInstance = supabase.channel(channelName);
+    
+    const subscription = channelInstance
       .on(
-        'postgres_changes' as const,
+        'postgres_changes',
         {
           event,
           schema,
           table: tableName,
-          filter,
-        } as { event: typeof event; schema: string; table: string; filter?: string },
-        (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {
+          ...(filter && { filter }),
+        },
+        (payload: { eventType: string; new: T | null; old: T | null; [key: string]: unknown }) => {
           console.log(`[Realtime] ${tableName} updated:`, payload.eventType);
-          onUpdate({
+          onUpdateRef.current({
             eventType: payload.eventType,
-            new: payload.new as T | null,
-            old: payload.old as T | null,
+            new: payload.new,
+            old: payload.old,
           });
         }
       )
@@ -62,7 +73,7 @@ export function useSupabaseRealtime<T>(
       supabase.removeChannel(subscription);
       setIsConnected(false);
     };
-  }, [tableName, event, schema, filter, enabled, onUpdate]);
+  }, [tableName, event, schema, filter, enabled]);
 
   const unsubscribe = useCallback(() => {
     if (channel) {
@@ -172,13 +183,22 @@ export function useMapSettings() {
  * ใช้ใน Maintenance Mode และ Global Settings
  */
 export function useSiteSettings() {
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<SiteSettings>({
+    id: '',
     site_name: 'CodeX',
     site_tagline: 'Developer Portfolio',
     contact_email: '',
     maintenance_mode: false,
     maintenance_message: 'เว็บไซต์กำลังปรับปรุง กรุณากลับมาใหม่ภายหลัง',
+    maintenance_title: 'Under Maintenance',
+    maintenance_detail: 'ขออภัยในความไม่สะดวก เรากำลังพัฒนาระบบเพื่อให้ดียิ่งขึ้น กรุณากลับมาใหม่ในภายหลัง',
+    maintenance_duration: 'A few hours',
     google_analytics_id: '',
+    available_for_work: true,
+    social_linkedin: '',
+    social_line: '',
+    created_at: '',
+    updated_at: ''
   });
   const [loading, setLoading] = useState(true);
 
@@ -187,6 +207,8 @@ export function useSiteSettings() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .single();
 
       if (!error && data) {
@@ -203,13 +225,35 @@ export function useSiteSettings() {
     fetchSettings();
   }, [fetchSettings]);
 
-  // Subscribe to realtime changes
-  useSupabaseRealtime(
+  // Listen for cross-tab updates (e.g. from Admin tab)
+  useEffect(() => {
+    const channel = new BroadcastChannel('site_settings_updates');
+    channel.onmessage = () => {
+      console.log('[Broadcast] Received update signal');
+      fetchSettings();
+    };
+    return () => channel.close();
+  }, [fetchSettings]);
+
+  // Polling fallback to ensure freshness if Realtime fails
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchSettings();
+    }, 2000); // Poll every 2 seconds for faster updates
+    return () => clearInterval(interval);
+  }, [fetchSettings]);
+
+  // Subscribe to realtime changes with aggressive update
+  useSupabaseRealtime<SiteSettings>(
     'site_settings',
     (payload) => {
+      console.log('[Realtime] Site settings event received:', payload);
+      // Trigger a re-fetch to ensure we get the full valid data including new columns
+      fetchSettings();
+      
       if (payload.new) {
-        console.log('[Realtime] Site settings updated:', payload.new);
-        setSettings(payload.new as typeof settings);
+        // Optimistically merge, but trust fetchSettings for final truth
+        setSettings(prev => ({ ...prev, ...(payload.new as SiteSettings) }));
       }
     }
   );

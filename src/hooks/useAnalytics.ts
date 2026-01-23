@@ -30,16 +30,34 @@ export const useAnalytics = () => {
           deviceType = 'mobile';
         }
 
-        // 3. หา Country จาก IP (ทำแบบ Asynchronous ไม่ให้ขวางการทำงานหลัก)
-        let country = 'Unknown';
-        try {
-          const ipResponse = await fetch('https://ipapi.co/json/');
-          if (ipResponse.ok) {
-            const ipData = await ipResponse.json();
-            country = ipData.country_name || 'Unknown';
+        // 3. หา Country จาก IP using fallback APIs
+        let country = 'Thailand'; // Default
+        
+        // Try multiple geolocation APIs
+        const geoApis = [
+          { url: 'https://ipwho.is/', key: 'country' },
+          { url: 'https://ip-api.com/json/', key: 'country' },
+          { url: 'https://ipapi.co/json/', key: 'country_name' }
+        ];
+        
+        for (const api of geoApis) {
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 2000);
+            
+            const response = await fetch(api.url, { signal: controller.signal });
+            clearTimeout(timeout);
+            
+            if (response.ok) {
+              const data = await response.json();
+              if (data[api.key]) {
+                country = data[api.key];
+                break; // Success, stop trying
+              }
+            }
+          } catch {
+            continue; // Try next API
           }
-        } catch (e) {
-          console.warn('Failed to fetch country:', e);
         }
 
         // 4. ส่งข้อมูล

@@ -9,7 +9,15 @@ import {
   IconMail,
 } from "@tabler/icons-react";
 
+import { useLocation } from "react-router-dom";
+
 export function NavigationDock() {
+  const location = useLocation();
+
+  if (location.pathname.startsWith('/admin')) {
+    return null;
+  }
+
   const links = [
     {
       title: "Home",
@@ -55,7 +63,7 @@ export function NavigationDock() {
     },
   ];
   return (
-    <div className="fixed bottom-4 md:bottom-8 left-0 right-0 z-50 items-center justify-center w-full pointer-events-none hidden md:flex lg:hidden pb-safe">
+    <div className="fixed bottom-4 md:bottom-8 left-0 right-0 z-50 flex items-center justify-center w-full pointer-events-none hidden md:flex lg:hidden pb-safe">
       <div className="pointer-events-auto">
         <FloatingDock
           items={links}

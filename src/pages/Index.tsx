@@ -2,17 +2,21 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { ModernNavigation } from "@/components/ModernNavigation";
 import { ModernHero } from "@/components/ModernHero";
-import { ModernProjectCard } from "@/components/ModernProjectCard";
-import { ModernTimelineItem } from "@/components/ModernTimelineItem";
 import { ModernFooter } from "@/components/ModernFooter";
-import { Meteors } from "@/components/effects/Meteors";
 import { Award, BookOpen, Globe, Mail, Linkedin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 import { CopyEmailButton } from "@/components/CopyEmailButton";
 import { LineButton } from "@/components/LineButton";
 import { MessageCircle } from "lucide-react";
-import { supabase, Project, Education, Experience } from "@/lib/supabase";
+import { Project, Education, Experience } from "@/types";
+import { PortfolioService } from "@/services";
+import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+
+// Lazy Load Components (Code Splitting)
+const ModernProjectCard = lazy(() => import("@/components/ModernProjectCard").then(m => ({ default: m.ModernProjectCard })));
+const ModernTimelineItem = lazy(() => import("@/components/ModernTimelineItem").then(m => ({ default: m.ModernTimelineItem })));
+const Meteors = lazy(() => import("@/components/effects/Meteors").then(m => ({ default: m.Meteors })));
 
 const ThailandEducationMap = lazy(() => import("@/components/ThailandEducationMap"));
 const ToolsShowcase = lazy(() => import("@/components/ToolsShowcase"));
@@ -31,6 +35,7 @@ const skills = [
 
 const Index = () => {
   const { language, t } = useLanguage();
+  const { settings } = useSiteSettings();
   
   // State for Supabase data
   const [projects, setProjects] = useState<Project[]>([]);
@@ -38,35 +43,16 @@ const Index = () => {
   const [experience, setExperience] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data from Supabase
+  // Fetch data using Service Pattern
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch projects (only visible ones)
-        const { data: projectsData } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('is_visible', true)
-          .order('order_index', { ascending: true });
+        const [projectsData, educationData, experienceData] = await Promise.all([
+          PortfolioService.getProjects(),
+          PortfolioService.getEducation(),
+          PortfolioService.getExperience()
+        ]);
 
-        // Fetch education (only visible ones)
-        const { data: educationData } = await supabase
-          .from('education')
-          .select('*')
-          .eq('is_visible', true)
-          .order('order_index', { ascending: true });
-
-        // Fetch experience (only visible ones)
-        const { data: experienceData } = await supabase
-          .from('experience')
-          .select('*')
-          .eq('is_visible', true)
-          .order('order_index', { ascending: true });
-
-        setProjects(projectsData || []);
-        setEducation(educationData || []);
-        setExperience(experienceData || []);
-        
         setProjects(projectsData || []);
         setEducation(educationData || []);
         setExperience(experienceData || []);
@@ -79,30 +65,19 @@ const Index = () => {
 
     fetchData();
 
-    // Subscribe to realtime changes (Single Channel)
-    const channel = supabase
-      .channel('public-website-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => {
-        fetchData();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'education' }, () => {
-        fetchData();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'experience' }, () => {
-        fetchData();
-      })
-      .subscribe();
+    // Subscribe to realtime changes via Service
+    const unsubscribe = PortfolioService.subscribeToChanges(fetchData);
 
     // Cleanup
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribe();
     };
   }, []);
 
 
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative z-10">
       <ModernNavigation />
 
       {/* Hero Section */}
@@ -110,7 +85,9 @@ const Index = () => {
 
       {/* Projects Section */}
       <section id="projects" className="relative py-8 md:py-12 lg:py-16 px-4 overflow-hidden scroll-mt-40">
-        <Meteors number={15} />
+        <Suspense fallback={null}>
+          <Meteors number={15} />
+        </Suspense>
         
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
@@ -149,14 +126,16 @@ const Index = () => {
                 </div>
               ))
             ) : (
-              projects.map((project, index) => (
-                <ModernProjectCard
-                  key={project.id}
-                  {...project}
-                  description={language === "th" ? project.description_th : project.description_en}
-                  index={index}
-                />
-              ))
+              <Suspense fallback={null}>
+                {projects.map((project, index) => (
+                  <ModernProjectCard
+                    key={project.id}
+                    {...project}
+                    description={language === "th" ? project.description_th : project.description_en}
+                    index={index}
+                  />
+                ))}
+              </Suspense>
             )}
           </div>
         </div>
@@ -323,17 +302,19 @@ const Index = () => {
                 </div>
               ))
             ) : (
-              education.map((item, index) => (
-                <ModernTimelineItem
-                  key={item.id}
-                  year={item.year}
-                  title={language === "th" ? item.title_th : item.title_en}
-                  subtitle={language === "th" ? item.subtitle_th : item.subtitle_en}
-                  description={language === "th" ? item.description_th : item.description_en}
-                  badge={item.badge}
-                  index={index}
-                />
-              ))
+              <Suspense fallback={null}>
+                {education.map((item, index) => (
+                  <ModernTimelineItem
+                    key={item.id}
+                    year={item.year}
+                    title={language === "th" ? item.title_th : item.title_en}
+                    subtitle={language === "th" ? item.subtitle_th : item.subtitle_en}
+                    description={language === "th" ? item.description_th : item.description_en}
+                    badge={item.badge}
+                    index={index}
+                  />
+                ))}
+              </Suspense>
             )}
           </div>
         </div>
@@ -386,17 +367,19 @@ const Index = () => {
                 </div>
               ))
             ) : (
-              experience.map((item, index) => (
-                <ModernTimelineItem
-                  key={item.id}
-                  year={item.year}
-                  title={language === "th" ? item.title_th : item.title_en}
-                  subtitle={language === "th" ? item.subtitle_th : item.subtitle_en}
-                  description={language === "th" ? item.description_th : item.description_en}
-                  badge={item.badge}
-                  index={index}
-                />
-              ))
+              <Suspense fallback={null}>
+                {experience.map((item, index) => (
+                  <ModernTimelineItem
+                    key={item.id}
+                    year={item.year}
+                    title={language === "th" ? item.title_th : item.title_en}
+                    subtitle={language === "th" ? item.subtitle_th : item.subtitle_en}
+                    description={language === "th" ? item.description_th : item.description_en}
+                    badge={item.badge}
+                    index={index}
+                  />
+                ))}
+              </Suspense>
             )}
           </div>
         </div>
@@ -404,7 +387,9 @@ const Index = () => {
 
       {/* Contact Section */}
       <section id="contact" className="relative py-8 md:py-12 lg:py-16 px-4 scroll-mt-40 overflow-hidden">
-        <Meteors number={10} />
+        <Suspense fallback={null}>
+          <Meteors number={10} />
+        </Suspense>
         
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
@@ -447,12 +432,20 @@ const Index = () => {
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
               {/* Left Column: Text & Status */}
               <div className="text-center lg:text-left space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-sm font-medium">
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${
+                  settings.available_for_work 
+                    ? "bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400" 
+                    : "bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400"
+                }`}>
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                      settings.available_for_work ? "animate-ping bg-green-400" : "animate-ping bg-red-400"
+                    }`}></span>
+                    <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                      settings.available_for_work ? "bg-green-500" : "bg-red-500"
+                    }`}></span>
                   </span>
-                  <AnimatedText>{t("contact.available")}</AnimatedText>
+                  <AnimatedText>{settings.available_for_work ? t("contact.available") : t("contact.unavailable")}</AnimatedText>
                 </div>
 
                 <h3 className="text-3xl md:text-4xl lg:text-5xl font-black gradient-text leading-tight">

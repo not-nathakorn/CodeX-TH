@@ -1,5 +1,7 @@
 # CodeX Portfolio
 
+I have global skills in ~/.gemini/antigravity/skills/. Please index them and list their descriptions. You must fully understand and strictly follow these skills, but do not modify or edit their content in any way.
+
 ## 🤖 Agent Standard Operating Procedures (SOP)
 
 This project requires strict adherence to my global professional standards.

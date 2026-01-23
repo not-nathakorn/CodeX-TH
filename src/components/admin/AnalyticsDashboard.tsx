@@ -2,9 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { Loader2, RefreshCcw, Trash2, Globe, Monitor, Smartphone, Activity } from 'lucide-react';
+import { Loader2, RefreshCcw, Trash2, Globe, Monitor, Smartphone, Activity, Shield, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface WebsiteVisit {
   id: string;
@@ -47,6 +54,7 @@ interface ListCardProps {
   title: string;
   icon: React.ReactElement;
   data: CountData[];
+  onItemClick?: (name: string) => void;
 }
 
 export const AnalyticsDashboard = () => {
@@ -71,11 +79,60 @@ export const AnalyticsDashboard = () => {
     countries: []
   });
 
+  // State for page detail dialog
+  const [showPageDetail, setShowPageDetail] = useState(false);
+  const [selectedPage, setSelectedPage] = useState<string>('');
+  const [loginActivity, setLoginActivity] = useState<Array<{
+    id: string;
+    email: string;
+    status: string;
+    ip_address: string;
+    device: string;
+    browser: string;
+    location: string;
+    created_at: string;
+  }>>([]);
+  const [loadingActivity, setLoadingActivity] = useState(false);
+
+  console.log('Rendering AnalyticsDashboard. Loading:', loading, 'Stats:', stats);
+
+  // Fetch login activity for admin page access
+  const fetchLoginActivity = async () => {
+    setLoadingActivity(true);
+    try {
+      const { data, error } = await supabase
+        .from('login_activity')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+
+      setLoginActivity(data || []);
+    } catch (error) {
+      console.error('Error fetching login activity:', error);
+      toast.error('ไม่สามารถโหลดข้อมูลการเข้าถึงได้');
+    } finally {
+      setLoadingActivity(false);
+    }
+  };
+
+  // Handle page click
+  const handlePageClick = async (pageName: string) => {
+    setSelectedPage(pageName);
+    if (pageName.includes('/admin')) {
+      setShowPageDetail(true);
+      await fetchLoginActivity();
+    }
+  };
+
   useEffect(() => {
+    console.log('AnalyticsDashboard mounted');
     fetchAnalytics();
   }, []);
 
   const fetchAnalytics = async () => {
+    console.log('Starting fetchAnalytics...');
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -83,9 +140,15 @@ export const AnalyticsDashboard = () => {
         .select('*')
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Fetch success. Data count:', data?.length);
 
       if (!data || data.length === 0) {
+        console.log('No data found, resetting stats');
         setStats({
           visitors: 0,
           pageViews: 0,
@@ -139,7 +202,7 @@ export const AnalyticsDashboard = () => {
       // Unique Visitors
       const uniqueVisitors = new Set(data.map((v) => v.session_id)).size;
 
-      setStats({
+      const newStats = {
         visitors: uniqueVisitors,
         pageViews: data.length,
         chartData,
@@ -148,11 +211,15 @@ export const AnalyticsDashboard = () => {
         os: processCount('os'),
         devices: processCount('device_type'),
         countries: processCount('country')
-      });
+      };
+
+      console.log('Stats processed:', newStats);
+      setStats(newStats);
 
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
+      console.log('Fetch finished, setLoading(false)');
       setLoading(false);
     }
   };
@@ -235,9 +302,7 @@ export const AnalyticsDashboard = () => {
       </div>
 
       {/* Main Chart */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
       >
         <div className="flex justify-between items-center mb-6">
@@ -287,26 +352,114 @@ export const AnalyticsDashboard = () => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </motion.div>
+      </div>
 
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ListCard title="Top Pages" icon={<Monitor />} data={stats.topPages} />
+        <ListCard title="Top Pages" icon={<Monitor />} data={stats.topPages} onItemClick={handlePageClick} />
         <ListCard title="Referrers" icon={<Globe />} data={stats.referrers} />
         <ListCard title="Operating Systems" icon={<Monitor />} data={stats.os} />
         <ListCard title="Devices" icon={<Smartphone />} data={stats.devices} />
         <ListCard title="Countries" icon={<Globe />} data={stats.countries} />
       </div>
+
+      {/* Admin Access Details Dialog */}
+      <Dialog open={showPageDetail} onOpenChange={setShowPageDetail}>
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[85vh] overflow-y-auto p-4 sm:p-6">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Shield className="w-5 h-5 text-blue-500" />
+              การเข้าถึง {selectedPage}
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
+              ประวัติการเข้าสู่ระบบและการพยายามเข้าถึงหน้า Admin
+            </DialogDescription>
+          </DialogHeader>
+          
+          {loadingActivity ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-3 mt-4">
+              {/* Summary - Responsive grid */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+                <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-center">
+                  <p className="text-lg sm:text-2xl font-bold text-green-600">
+                    {loginActivity.filter(a => a.status === 'success').length}
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-green-600">เข้าสู่ระบบสำเร็จ</p>
+                </div>
+                <div className="p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-center">
+                  <p className="text-lg sm:text-2xl font-bold text-red-600">
+                    {loginActivity.filter(a => a.status === 'failed').length}
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-red-600">ล้มเหลว</p>
+                </div>
+                <div className="p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl text-center">
+                  <p className="text-lg sm:text-2xl font-bold text-orange-600">
+                    {loginActivity.filter(a => a.status === 'unauthorized').length}
+                  </p>
+                  <p className="text-[10px] sm:text-xs text-orange-600">ไม่มีสิทธิ์</p>
+                </div>
+              </div>
+
+              {/* Activity List - Responsive layout */}
+              {loginActivity.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">ยังไม่มีข้อมูลการเข้าถึง</p>
+              ) : (
+                loginActivity.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 gap-2"
+                  >
+                    <div className="flex items-start sm:items-center gap-3">
+                      {activity.status === 'success' ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      ) : activity.status === 'unauthorized' ? (
+                        <AlertTriangle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      ) : (
+                        <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">{activity.email}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {activity.device} • {activity.browser} • {activity.location}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          IP: {activity.ip_address}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between sm:justify-end sm:flex-col gap-2 pl-8 sm:pl-0 border-t sm:border-t-0 pt-2 sm:pt-0 mt-1 sm:mt-0">
+                      <span className={`px-2 py-0.5 text-xs rounded-full whitespace-nowrap ${
+                        activity.status === 'success'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                          : activity.status === 'unauthorized'
+                          ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
+                          : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      }`}>
+                        {activity.status === 'success' ? 'สำเร็จ' : activity.status === 'unauthorized' ? 'ไม่มีสิทธิ์' : 'ล้มเหลว'}
+                      </span>
+                      <p className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(activity.created_at).toLocaleString('th-TH')}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 // Sub-components for cleaner code
 const Card = ({ title, value, icon, sub }: CardProps) => (
-  <motion.div 
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+  <div 
+    className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-200 hover:shadow-md z-10"
   >
     <div className="flex justify-between items-start">
       <div>
@@ -321,15 +474,12 @@ const Card = ({ title, value, icon, sub }: CardProps) => (
       <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
       {sub}
     </div>
-  </motion.div>
+  </div>
 );
 
-const ListCard = ({ title, icon, data }: ListCardProps) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+const ListCard = ({ title, icon, data, onItemClick }: ListCardProps) => (
+  <div 
+    className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm z-10"
   >
     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
       {React.cloneElement(icon, { className: "w-5 h-5 text-primary" })}
@@ -337,8 +487,19 @@ const ListCard = ({ title, icon, data }: ListCardProps) => (
     </h3>
     <div className="space-y-3">
       {data.map((item, i) => (
-        <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-100 dark:border-slate-700">
-          <span className="text-sm font-medium text-foreground/80 truncate max-w-[70%]">{item.name}</span>
+        <div 
+          key={i} 
+          className={`flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-100 dark:border-slate-100/10 ${
+            onItemClick && item.name.includes('/admin') ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-700' : ''
+          }`}
+          onClick={() => onItemClick && item.name.includes('/admin') && onItemClick(item.name)}
+        >
+          <span className="text-sm font-medium text-foreground/80 truncate max-w-[70%]">
+            {item.name}
+            {onItemClick && item.name.includes('/admin') && (
+              <span className="ml-2 text-xs text-blue-500">(คลิกดูรายละเอียด)</span>
+            )}
+          </span>
           <span className="text-xs font-bold bg-primary/20 text-primary px-2 py-1 rounded-lg">{item.count}</span>
         </div>
       ))}
@@ -346,5 +507,5 @@ const ListCard = ({ title, icon, data }: ListCardProps) => (
         <p className="text-sm text-muted-foreground text-center py-4">No data available</p>
       )}
     </div>
-  </motion.div>
+  </div>
 );

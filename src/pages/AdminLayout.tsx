@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconSettings,
@@ -10,15 +10,53 @@ import {
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { SettingsManager } from "@/components/admin/SettingsManager";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNoIndex } from "@/hooks/useNoIndex";
 
 export function AdminLayout() {
+  useNoIndex(); // Prevent indexing of admin pages
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'content' | 'settings'>('dashboard');
   const [open, setOpen] = useState(false);
+  const [displayName, setDisplayName] = useState<string>('Admin');
+
+  // Fetch display_name from personal_info table
+  useEffect(() => {
+    const fetchDisplayName = async () => {
+      try {
+        const { data } = await supabase
+          .from('personal_info')
+          .select('display_name')
+          .limit(1)
+          .maybeSingle();
+        
+        if (data?.display_name) {
+          setDisplayName(data.display_name);
+        }
+      } catch (error) {
+        console.warn('Could not fetch display_name:', error);
+      }
+    };
+    
+    fetchDisplayName();
+    
+    // Listen for display name updates from SettingsManager
+    const handleDisplayNameUpdate = (event: CustomEvent<{ displayName: string }>) => {
+      if (event.detail?.displayName) {
+        setDisplayName(event.detail.displayName);
+      }
+    };
+    
+    window.addEventListener('displayNameUpdated', handleDisplayNameUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('displayNameUpdated', handleDisplayNameUpdate as EventListener);
+    };
+  }, [activeTab]); // Refetch when switching tabs (in case settings was updated)
 
   const links = [
     {
@@ -59,13 +97,13 @@ export function AdminLayout() {
     <div
       className={cn(
         "flex flex-col md:flex-row w-full flex-1 mx-auto overflow-hidden",
-        "h-screen bg-slate-50 dark:bg-[#0B1120]" 
+        "h-screen bg-slate-50 dark:bg-[#0B1120] relative z-10" 
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-6 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800 shadow-2xl">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            {open ? <Logo /> : <LogoIcon />}
+            <Logo />
             <div className="mt-8 flex flex-col gap-2">
               {links.map((link, idx) => (
                 <div key={idx} onClick={link.onClick}>
@@ -75,18 +113,20 @@ export function AdminLayout() {
             </div>
           </div>
           <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-slate-800 pt-4">
-            <SidebarLink
-              link={{
-                label: user?.username || user?.email || "Admin",
-                href: "#",
-                icon: (
-                  <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-900">
-                    {user?.username?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || "A"}
-                  </div>
-                ),
-              }}
-              className="hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200"
-            />
+            <div onClick={() => setActiveTab('settings')} className="cursor-pointer">
+              <SidebarLink
+                link={{
+                  label: displayName || user?.username || "Admin",
+                  href: "#",
+                  icon: (
+                    <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-900">
+                      {displayName?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || "A"}
+                    </div>
+                  ),
+                }}
+                className="hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200"
+              />
+            </div>
             <button
               onClick={logout}
               className={cn(
@@ -103,10 +143,8 @@ export function AdminLayout() {
       <div className="flex flex-1 flex-col overflow-hidden pt-14 md:pt-0">
         <div className="p-2 sm:p-4 md:p-8 flex flex-col gap-4 sm:gap-6 flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
           {/* Header Card with Glass Effect */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-[#1E293B] rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm"
+          <div 
+            className="bg-white dark:bg-[#1E293B] rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300"
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
@@ -129,19 +167,16 @@ export function AdminLayout() {
                 <span className="text-xs text-muted-foreground">System Online</span>
               </div>
             </div>
-          </motion.div>
+          </div>
           
           {/* Content Area */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="flex-1"
+          <div
+            className="flex-1 transition-opacity duration-300"
           >
             {activeTab === 'dashboard' && <AnalyticsDashboard />}
             {activeTab === 'content' && <ContentManager />}
             {activeTab === 'settings' && <SettingsManager />}
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

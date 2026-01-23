@@ -8,9 +8,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useNoIndex } from "@/hooks/useNoIndex";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { logLoginActivity, createActiveSession } from "@/lib/securityLogger";
 
 const AUTH_HUB = import.meta.env.VITE_BLACKBOX_AUTH_URL || "https://bbh.codex-th.com";
 const CLIENT_ID = import.meta.env.VITE_BLACKBOX_CLIENT_ID;
@@ -63,23 +65,34 @@ export default function CallbackPage() {
         console.log("📦 Token response:", data.success ? "SUCCESS" : "FAILED");
 
         if (data.success && data.user) {
+          // Debug: ดู data ทั้งหมดที่ได้จาก BlackBox
+          console.log("🔐 BlackBox user data:", JSON.stringify(data.user, null, 2));
+          console.log("🔐 Role received:", data.user.role);
+          
           // ✅ Set user, token, AND expiry (bypasses cookie requirement)
-          console.log("🔐 Setting user and token, expires_in:", data.expires_in);
           setUserDirectly({
             id: data.user.id,
+            blackbox_id: data.user.blackbox_id,  // B-USR-XXXX (Global)
+            client_id: data.user.client_id,      // Site ID
             email: data.user.email,
             username: data.user.username,
             first_name: data.user.first_name,
             last_name: data.user.last_name,
+            phone: data.user.phone,
             role: data.user.role || "end_user"
-          }, data.access_token, data.expires_in); // ✅ Pass token AND expiry
+          }, data.access_token, data.expires_in, data.refresh_token); // ✅ Pass token, expiry AND refresh token
 
           setStatus("success");
+
+          // 📝 Fire-and-forget: Log to security audit (don't block redirect!)
+          logLoginActivity({
+            userId: data.user.id,
+            email: data.user.email,
+            status: 'success'
+          }).catch(e => console.warn('Security log failed:', e));
           
-          // Try refresh in background (may fail for cross-domain, that's OK)
-          refreshAuth().catch(() => {
-            console.log("ℹ️ Background refresh failed (normal for cross-domain)");
-          });
+          // Fire-and-forget: Create active session
+          createActiveSession(data.user.id).catch(e => console.warn('Session log failed:', e));
           
           // Redirect after a short delay to ensure state is propagated
           const storedReturnUrl = sessionStorage.getItem("return_url");
@@ -88,9 +101,15 @@ export default function CallbackPage() {
           // ✅ SECURITY: Validate returnUrl to prevent Open Redirect attacks
           const getSafeUrl = (url: string | null): string => {
             if (!url) return "/";
-            // Only allow relative paths (starts with /) and prevent protocol-relative (//)
-            if (url.startsWith("/") && !url.startsWith("//") && !url.includes("\\")) {
-              return url;
+            try {
+              // Parse URL relative to current origin
+              const targetUrl = new URL(url, window.location.origin);
+              // Ensure we stay on the same origin (prevents external redirects)
+              if (targetUrl.origin === window.location.origin) {
+                return targetUrl.pathname + targetUrl.search + targetUrl.hash;
+              }
+            } catch {
+              // Invalid URL
             }
             return "/";
           };
@@ -100,12 +119,19 @@ export default function CallbackPage() {
           // Clear stored URL to prevent sticky redirects
           if (storedReturnUrl) sessionStorage.removeItem("return_url");
 
-          console.log("➡️ Redirecting to:", returnUrl);
+          // console.log("➡️ Redirecting to:", returnUrl);
           setTimeout(() => {
             navigate(returnUrl); 
-          }, 1500);
+          }, 500); // Fast redirect
         } else {
           console.error("Token exchange failed:", data);
+          
+          // 📝 Log failed login attempt
+          logLoginActivity({
+            email: 'unknown',
+            status: 'failed'
+          });
+          
           setStatus("error");
           setErrorMessage(data.error || "Token exchange failed");
         }

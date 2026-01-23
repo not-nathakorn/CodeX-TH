@@ -6,9 +6,11 @@ import { Spotlight } from "./effects/Spotlight";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnimatedText } from "./ui/AnimatedText";
 import { PinContainer } from "./ui/3d-pin";
+import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
 
 export const ModernHero = () => {
   const { t, language } = useLanguage();
+  const { settings } = useSiteSettings();
 
   const handleScroll = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -17,7 +19,7 @@ export const ModernHero = () => {
   return (
     <section id="home" className="relative min-h-screen flex flex-col items-center pt-48 md:pt-44 overflow-hidden">
       {/* Background Effects */}
-      <LiquidBackground />
+      {/* LiquidBackground is global in App.tsx */}
       <Spotlight className="hidden md:block opacity-50" />
 
       {/* Content - z-0 เพื่อให้อยู่ใต้ Navbar (z-50) */}
@@ -30,9 +32,9 @@ export const ModernHero = () => {
             transition={{ duration: 0.5 }}
             className="inline-block mb-8"
           >
-            <div className="relative">
+            <div className="relative" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
               <motion.div
-                className="absolute -inset-2 bg-blue-400 opacity-30 blur-xl"
+                className="absolute -inset-2 bg-blue-400 opacity-30 blur-xl rounded-full"
                 animate={{
                   scale: [1, 1.2, 1],
                   opacity: [0.3, 0.5, 0.3],
@@ -42,8 +44,12 @@ export const ModernHero = () => {
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
+                style={{ willChange: 'transform, opacity' }}
               />
-              <span className="relative px-6 py-2 bg-white/50 backdrop-blur-md rounded-full text-sm font-bold text-blue-600 border border-blue-200 inline-flex items-center gap-2 shadow-sm">
+              <span 
+                className="relative px-6 py-2 bg-white/50 backdrop-blur-md rounded-full text-sm font-bold text-blue-600 border border-blue-200 inline-flex items-center gap-2 shadow-sm"
+                style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+              >
                 <Sparkles className="w-4 h-4" />
                 <AnimatedText>{language === 'th' ? 'สวัสดีครับ 👋' : 'Hello World 👋'}</AnimatedText>
               </span>
@@ -107,8 +113,12 @@ export const ModernHero = () => {
                   {/* Main badge */}
                   <div className="relative inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-900 rounded-2xl shadow-xl">
                     <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-lg shadow-emerald-500/50"></span>
+                      <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                        settings.available_for_work ? "bg-emerald-400" : "bg-red-400"
+                      }`}></span>
+                      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 shadow-lg ${
+                        settings.available_for_work ? "bg-emerald-500 shadow-emerald-500/50" : "bg-red-500 shadow-red-500/50"
+                      }`}></span>
                     </span>
                     <span className="text-base md:text-lg font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
                       {t("hero.role")}
