@@ -14,7 +14,7 @@ if ('serviceWorker' in navigator) {
 import { registerSW } from 'virtual:pwa-register';
 
 console.log("Environment:", import.meta.env.MODE);
-console.log("✅ Codebase Updated: 2026-01-13");
+console.log("✅ Codebase Updated: 2026-01-24");
 
 // Auto-update PWA logic
 const updateSW = registerSW({
