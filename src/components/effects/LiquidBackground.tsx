@@ -4,7 +4,7 @@ export const LiquidBackground = () => {
   return (
     <div 
       className="fixed inset-0 overflow-hidden pointer-events-none"
-      style={{ zIndex: 0 }}
+      style={{ zIndex: -1 }}
     >
       {/* Base Background Layer */}
       <div className="absolute inset-0 bg-[#f8fafc] dark:bg-[#0a0a0a] transition-colors duration-300" />

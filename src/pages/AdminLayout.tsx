@@ -99,8 +99,8 @@ export function AdminLayout() {
   return (
     <div
       className={cn(
-        "flex flex-col md:flex-row w-full flex-1 mx-auto overflow-hidden",
-        "h-screen bg-slate-50 dark:bg-[#0B1120] relative z-10" 
+        "flex flex-col md:flex-row w-full h-[100dvh] mx-auto overflow-hidden",
+        "bg-slate-50 dark:bg-[#0B1120] relative z-0" 
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
