@@ -673,7 +673,17 @@ const Index = () => {
                 {/* Scrollable Content */}
                 <div className="p-6 sm:p-8 pt-0 overflow-y-auto customized-scrollbar">
                    <div className="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                      {language === 'th' ? selectedExperience.description_th : selectedExperience.description_en}
+                      {/* Short Description (Summary) */}
+                      <p className="font-medium text-lg mb-4">
+                        {language === 'th' ? selectedExperience.description_th : selectedExperience.description_en}
+                      </p>
+                      
+                      {/* Long Description (Details) */}
+                      {(language === 'th' ? selectedExperience.description_long_th : selectedExperience.description_long_en) && (
+                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 whitespace-pre-wrap text-base">
+                           {language === 'th' ? selectedExperience.description_long_th : selectedExperience.description_long_en}
+                        </div>
+                      )}
                    </div>
 
                    {/* Image Gallery */}

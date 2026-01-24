@@ -25,6 +25,8 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
     subtitle_en: '',
     description_th: '',
     description_en: '',
+    description_long_th: '',
+    description_long_en: '',
     badge: '',
     images: [] as string[],
     order_index: 0,
@@ -43,6 +45,8 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
         subtitle_en: experience.subtitle_en,
         description_th: experience.description_th || '',
         description_en: experience.description_en || '',
+        description_long_th: experience.description_long_th || '',
+        description_long_en: experience.description_long_en || '',
         badge: experience.badge || '',
         images: experience.images || [],
         order_index: experience.order_index,
@@ -51,6 +55,58 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
       setImagesInput((experience.images || []).join('\n'));
     }
   }, [experience]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setLoading(true);
+    const files = Array.from(e.target.files);
+    const newUrls: string[] = [];
+
+    try {
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `experience/${fileName}`;
+
+        // Upload to 'images' bucket (public)
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Upload Error:', uploadError);
+          // Try 'public' bucket if 'images' fails or handle error
+           if (uploadError.message.includes("Bucket not found")) {
+             toast.error("ไม่พบ Storage Bucket 'images' กรุณาสร้าง Bucket ก่อน");
+             continue;
+           }
+           throw uploadError;
+        }
+
+        // Get Public URL
+        const { data } = supabase.storage
+          .from('images')
+          .getPublicUrl(filePath);
+          
+        if (data.publicUrl) {
+          newUrls.push(data.publicUrl);
+        }
+      }
+
+      if (newUrls.length > 0) {
+        setImagesInput(prev => prev ? `${prev}\n${newUrls.join('\n')}` : newUrls.join('\n'));
+        toast.success(`อัปโหลดรูปภาพ ${newUrls.length} รูปสำเร็จ`);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast.error('การอัปโหลดรูปภาพล้มเหลว');
+    } finally {
+      setLoading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +120,8 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
 
       const dataToSave = {
         ...formData,
+        description_long_th: formData.description_long_th || null,
+        description_long_en: formData.description_long_en || null,
         badge: formData.badge || null,
         images: processedImages,
       };
@@ -184,6 +242,30 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
             />
           </div>
 
+          <div className="space-y-4 pt-2 border-t border-dashed border-slate-200">
+             <div className="space-y-2">
+              <Label htmlFor="description_long_th">รายละเอียดแบบยาว (ไทย) - แสดงใน Popup</Label>
+              <Textarea
+                id="description_long_th"
+                value={formData.description_long_th}
+                onChange={(e) => setFormData({ ...formData, description_long_th: e.target.value })}
+                rows={5}
+                placeholder="รายละเอียดเพิ่มเติมที่ต้องการแสดงเมื่อกดดู"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description_long_en">รายละเอียดแบบยาว (อังกฤษ) - แสดงใน Popup</Label>
+              <Textarea
+                id="description_long_en"
+                value={formData.description_long_en}
+                onChange={(e) => setFormData({ ...formData, description_long_en: e.target.value })}
+                rows={5}
+                placeholder="Additional details shown in popup"
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="badge">Badge (ถ้ามี)</Label>
@@ -207,7 +289,19 @@ export const ExperienceForm = ({ experience, onClose, onSave }: ExperienceFormPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="images">รูปภาพ (ลิงก์ URL, บรรทัดละ 1 ลิงก์)</Label>
+            <Label htmlFor="images">รูปภาพ (อัปโหลด หรือ ลิงก์ URL)</Label>
+            
+            <div className="flex gap-2 mb-2">
+               <Input 
+                 type="file" 
+                 id="image_upload" 
+                 multiple 
+                 accept="image/*"
+                 onChange={handleFileUpload}
+                 className="cursor-pointer file:cursor-pointer"
+               />
+            </div>
+
             <Textarea
               id="images"
               value={imagesInput}

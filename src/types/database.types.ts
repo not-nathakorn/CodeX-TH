@@ -37,6 +37,8 @@ export interface Experience {
   subtitle_en: string;
   description_th: string;
   description_en: string;
+  description_long_th?: string;
+  description_long_en?: string;
   badge?: string;
   images?: string[];
   order_index: number;
