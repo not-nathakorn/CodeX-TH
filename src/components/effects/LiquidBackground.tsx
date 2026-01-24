@@ -17,7 +17,7 @@ export const LiquidBackground = () => {
             <div 
               className="w-full h-full rounded-full animate-blob-pulse blob-1 blur-[60px] md:blur-[100px]"
               style={{
-                background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.45) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)',
+                background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.30) 0%, rgba(59, 130, 246, 0.15) 40%, transparent 70%)',
               }}
             />
           </div>
@@ -27,7 +27,7 @@ export const LiquidBackground = () => {
             <div 
               className="w-full h-full rounded-full animate-blob-pulse animation-delay-2000 blob-2 blur-[80px] md:blur-[130px]"
               style={{
-                background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.35) 0%, rgba(236, 72, 153, 0.15) 40%, transparent 70%)',
+                background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.20) 0%, rgba(236, 72, 153, 0.10) 40%, transparent 70%)',
               }}
             />
           </div>
@@ -37,13 +37,20 @@ export const LiquidBackground = () => {
             <div 
               className="w-full h-full rounded-full animate-blob-pulse animation-delay-4000 blob-3 blur-[60px] md:blur-[100px]"
               style={{
-                background: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.40) 0%, rgba(34, 197, 94, 0.20) 40%, transparent 70%)',
+                background: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.20) 0%, rgba(34, 197, 94, 0.10) 40%, transparent 70%)',
               }}
             />
           </div>
         </div>
 
-
+        {/* Mobile Tinted Edge Fade (Re-applied) - Essential for blending blobs with browser UI */}
+        <div className="absolute inset-0 pointer-events-none md:hidden">
+          {/* Top - Blue Tint to match Top Blob */}
+          <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#eff6ff] via-[#eff6ff]/60 dark:from-[#172554] dark:via-[#172554]/60 to-transparent" />
+          
+          {/* Bottom - Pink Tint to match Bottom Blob */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#fdf2f8] via-[#fdf2f8]/60 dark:from-[#500724] dark:via-[#500724]/60 to-transparent" />
+        </div>
       </div>
       
       {/* Dark Mode Override Styles */}
