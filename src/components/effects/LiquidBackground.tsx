@@ -43,7 +43,14 @@ export const LiquidBackground = () => {
           </div>
         </div>
 
-
+        {/* Mobile Tinted Edge Fade - Matches Blob Colors for seamless bezel blending */}
+        <div className="absolute inset-0 pointer-events-none md:hidden">
+          {/* Top - Blue Tint to match Top Blob */}
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#eff6ff] dark:from-[#172554] to-transparent" />
+          
+          {/* Bottom - Pink Tint to match Bottom Blob */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fdf2f8] dark:from-[#500724] to-transparent" />
+        </div>
       </div>
       
       {/* Dark Mode Override Styles */}
