@@ -65,9 +65,15 @@ export function BBHAuthProvider({ children }: { children: ReactNode }) {
                     .maybeSingle();
                 
                 // If the logged in email matches the personal_info email, they are the admin
-                if (info && info.email === userData.email) {
+                // 2024-01-24: Make comparison case-insensitive and safer
+                if (info && info.email && userData.email && info.email.toLowerCase() === userData.email.toLowerCase()) {
                     console.log('Assigning Admin Role based on personal_info match');
                     userData = { ...userData, role: 'admin' };
+                } else {
+                    console.log('Admin check failed:', { 
+                        params_email: userData?.email, 
+                        stored_email: info?.email 
+                    });
                 }
             } catch (err) {
                 console.warn('Role fallback check failed:', err);

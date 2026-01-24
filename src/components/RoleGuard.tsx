@@ -7,6 +7,7 @@
 // ============================================================
 
 import { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useBBHAuth } from '../hooks/useBBHAuth';
 import LazyFallback from './LazyFallback';
 import { ShieldX, User, Mail, BadgeCheck, Lock, ArrowLeft, LogOut } from 'lucide-react';
@@ -46,10 +47,11 @@ export function RoleGuard({
 
   // Check role
   if (!allowedRoles.includes(user.role || '')) {
-    return fallback || (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    const deniedContent = fallback || (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-sans antialiased">
         {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900" />
+        <div className="absolute inset-0 bg-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-red-950/40 to-slate-900" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-500/10 via-transparent to-transparent" />
         
         {/* Floating particles */}
@@ -80,10 +82,10 @@ export function RoleGuard({
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative z-10 w-full max-w-md"
+          className="relative z-10 w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar"
         >
           {/* Glass Card */}
-          <div className="bg-white/10 dark:bg-black/30 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-white/10 shadow-2xl overflow-hidden">
+          <div className="bg-slate-900/40 backdrop-blur-2xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             
             {/* Header with Icon */}
             <div className="relative px-8 pt-10 pb-6 text-center">
@@ -161,7 +163,7 @@ export function RoleGuard({
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-white/40">สิทธิ์ปัจจุบัน</p>
-                    <span className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-1 bg-amber-500/20 text-amber-300 text-xs font-medium rounded-full border border-amber-500/30">
+                    <span className="inline-flex items-center gap-1.5 mt-1 px-2.5 py-1 bg-amber-500/10 text-amber-300 text-xs font-medium rounded-full border border-amber-500/20">
                       <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse" />
                       {user.role || 'ไม่มี'}
                     </span>
@@ -231,6 +233,8 @@ export function RoleGuard({
         </motion.div>
       </div>
     );
+    
+    return createPortal(deniedContent, document.body);
   }
 
   // Role allowed - render children
