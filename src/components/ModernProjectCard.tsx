@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { vibrate } from "@/lib/utils";
 
 interface ModernProjectCardProps {
   title: string;
@@ -31,7 +32,13 @@ export const ModernProjectCard = ({
       onHoverEnd={() => setIsHovered(false)}
       className="group relative"
     >
-      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+      <a 
+        href={url} 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="block"
+        onClick={() => vibrate()}
+      >
         {/* Card */}
         <motion.div
           className="relative glass rounded-2xl p-4 md:p-6 overflow-hidden border border-border/50 transition-all duration-500"
