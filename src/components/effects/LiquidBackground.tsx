@@ -49,8 +49,7 @@ export const LiquidBackground = () => {
         className="fixed inset-0 pointer-events-none md:hidden"
         style={{ zIndex: 40 }}
       >
-        {/* Top Edge - Deep Fade (Stronger to match example) */}
-        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#f8fafc] via-[#f8fafc]/90 dark:from-[#0a0a0a] dark:via-[#0a0a0a]/90 to-transparent" />
+
         
 
 
