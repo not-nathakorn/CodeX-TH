@@ -399,6 +399,23 @@
     padding-right: env(safe-area-inset-right);
   }
 
+  /* Container หลักของแอป (ตามคำแนะนำ) */
+  .main-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    min-height: 100dvh;
+    width: 100%;
+  }
+
+  /* Full Screen Section - แก้ปัญหา Address Bar บัง */
+  .full-screen-section {
+    height: 100vh; /* Fallback */
+    height: 100dvh; /* Dynamic Height */
+    min-height: 100dvh;
+  }
+
   /* Safe Area Individual */
   .pt-safe {
     padding-top: env(safe-area-inset-top);

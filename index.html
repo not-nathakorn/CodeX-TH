@@ -39,12 +39,12 @@
 
           if (isDark) {
             html.classList.add("dark");
-            html.style.backgroundColor = "#000000";
-            targetColor = "#000000";
+            html.style.backgroundColor = "#0a0a0a"; // Matches LiquidBackground Dark
+            targetColor = "#0a0a0a";
           } else {
             html.classList.remove("dark");
-            html.style.backgroundColor = "#FFFFFF";
-            targetColor = "#FFFFFF";
+            html.style.backgroundColor = "#f8fafc"; // Matches LiquidBackground Light
+            targetColor = "#f8fafc";
           }
 
           // CRITICAL: Force update theme-color meta for Safari PWA edges

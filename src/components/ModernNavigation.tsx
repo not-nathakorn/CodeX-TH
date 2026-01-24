@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn, vibrate } from "@/lib/utils";
 import { Languages } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -31,7 +31,7 @@ export const ModernNavigation = () => {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 md:hidden lg:flex pt-safe"
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none px-4 pt-safe"
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <motion.nav
@@ -54,6 +54,7 @@ export const ModernNavigation = () => {
               className="h-10 w-40 md:h-12 md:w-48 flex items-center justify-center flex-shrink-0 -my-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => vibrate()}
             >
               <TextHoverEffect text="CodeX" />
             </motion.a>
@@ -75,6 +76,7 @@ export const ModernNavigation = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => vibrate()}
                   >
                     <AnimatedText>{t(item.labelKey)}</AnimatedText>
                   </motion.a>
@@ -99,6 +101,7 @@ export const ModernNavigation = () => {
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => vibrate()}
                 >
                   <AnimatedText>{t(item.labelKey)}</AnimatedText>
                   <motion.span
@@ -113,7 +116,10 @@ export const ModernNavigation = () => {
             <div className="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
               {/* Language Toggle */}
               <motion.button
-                onClick={() => setLanguage(language === "th" ? "en" : "th")}
+                onClick={() => {
+                  vibrate();
+                  setLanguage(language === "th" ? "en" : "th");
+                }}
                 className={cn(
                   "px-2 md:px-3 py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300",
                   "bg-neutral-100/80 dark:bg-neutral-800/80",
@@ -131,11 +137,11 @@ export const ModernNavigation = () => {
                   <AnimatedText>{language.toUpperCase()}</AnimatedText>
                 </span>
               </motion.button>
-
-              {/* Theme Toggle */}
-              <div className="scale-90 md:scale-100">
-                <ModeToggle />
-              </div>
+              
+               {/* Theme Toggle */}
+               <div className="scale-90 md:scale-100" onClick={() => vibrate()}>
+                 <ModeToggle />
+               </div>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { vibrate } from "@/lib/utils";
 
 interface ModernTimelineItemProps {
   year: string;
@@ -19,6 +20,13 @@ export const ModernTimelineItem = ({
   index,
   onClick,
 }: ModernTimelineItemProps) => {
+  const handleClick = () => {
+    if (onClick) {
+      vibrate();
+      onClick();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -50 }}
@@ -52,7 +60,7 @@ export const ModernTimelineItem = ({
       <div className="absolute left-[5px] md:left-[7px] top-6 w-0.5 h-full bg-gradient-to-b from-border via-border/50 to-transparent" />
 
       <motion.div
-        onClick={onClick}
+        onClick={handleClick}
         className={`glass rounded-xl p-4 md:p-6 border border-border/50 hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/20 ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
         whileHover={{ scale: 1.02, x: 5 }}
       >

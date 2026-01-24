@@ -7,17 +7,19 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AnimatedText } from "./ui/AnimatedText";
 import { PinContainer } from "./ui/3d-pin";
 import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+import { vibrate } from "@/lib/utils";
 
 export const ModernHero = () => {
   const { t, language } = useLanguage();
   const { settings } = useSiteSettings();
 
   const handleScroll = (id: string) => {
+    vibrate();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex flex-col items-center pt-48 md:pt-44 overflow-hidden">
+    <section id="home" className="relative min-h-screen flex flex-col items-center pt-32 md:pt-44 overflow-hidden">
       {/* Background Effects */}
       {/* LiquidBackground is global in App.tsx */}
       <Spotlight className="hidden md:block opacity-50" />

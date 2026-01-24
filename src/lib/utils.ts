@@ -4,3 +4,9 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export function vibrate(ms: number = 15) {
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
