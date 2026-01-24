@@ -108,33 +108,26 @@ export const ContentManager = () => {
   };
 
   const fetchProjects = async () => {
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('order_index', { ascending: true });
+    // Use RPC to fetch all data (including hidden) securely
+    const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'projects' });
     
     if (error) throw error;
-    setProjects(data || []);
+    // RPC returns JSON, cast it to type
+    setProjects((data as unknown as Project[]) || []);
   };
 
   const fetchEducation = async () => {
-    const { data, error } = await supabase
-      .from('education')
-      .select('*')
-      .order('order_index', { ascending: true });
+    const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'education' });
     
     if (error) throw error;
-    setEducation(data || []);
+    setEducation((data as unknown as Education[]) || []);
   };
 
   const fetchExperience = async () => {
-    const { data, error } = await supabase
-      .from('experience')
-      .select('*')
-      .order('order_index', { ascending: true });
+    const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'experience' });
     
     if (error) throw error;
-    setExperience(data || []);
+    setExperience((data as unknown as Experience[]) || []);
   };
 
   const fetchPersonalInfo = async () => {
