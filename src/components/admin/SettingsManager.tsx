@@ -488,7 +488,7 @@ export const SettingsManager = () => {
   return (
     <div className="space-y-6">
       {/* Settings Navigation */}
-      <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-black/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Mobile: Horizontal scroll tabs */}
           <div className="border-b border-slate-200 dark:border-slate-700">
@@ -503,7 +503,7 @@ export const SettingsManager = () => {
                       data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 
                       data-[state=active]:text-white data-[state=active]:shadow-lg
                       data-[state=inactive]:text-slate-600 data-[state=inactive]:dark:text-slate-400
-                      data-[state=inactive]:hover:bg-slate-100 data-[state=inactive]:dark:hover:bg-slate-800"
+                      data-[state=inactive]:hover:bg-slate-100 data-[state=inactive]:dark:hover:bg-white/5"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="hidden sm:inline">{tab.label}</span>
@@ -520,8 +520,8 @@ export const SettingsManager = () => {
               {activeTab === 'appearance' && (
                 <TabsContent value="appearance" key="appearance" className="mt-0">
                 <div className="animate-fade-in">
-                  <Card className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50">
-                    <CardHeader className="pb-4 border-b border-slate-100 dark:border-slate-700">
+                  <Card className="border-slate-200 dark:border-white/10 bg-white dark:bg-black/20">
+                    <CardHeader className="pb-4 border-b border-slate-100 dark:border-white/5">
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
                           <Palette className="w-6 h-6 text-white" />
@@ -536,9 +536,9 @@ export const SettingsManager = () => {
                       {/* Theme Mode */}
                       <div className="space-y-3">
                         <Label className="text-base font-bold text-slate-800 dark:text-slate-200">ธีม</Label>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/10">
                           <div className="flex items-center gap-3">
-                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-indigo-100 dark:bg-indigo-900' : 'bg-amber-100'}`}>
+                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${isDarkMode ? 'bg-indigo-900/40' : 'bg-amber-100'}`}>
                               {isDarkMode ? (
                                 <Moon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                               ) : (
@@ -557,7 +557,7 @@ export const SettingsManager = () => {
                       {/* Accent Color */}
                       <div className="space-y-3">
                         <Label className="text-base font-bold text-slate-800 dark:text-slate-200">สีหลักของเว็บไซต์</Label>
-                        <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/10">
                           <div className="flex flex-wrap gap-3">
                             {accentColors.map((color) => (
                               <button
@@ -568,8 +568,8 @@ export const SettingsManager = () => {
                                 }}
                                 className={`group flex flex-col items-center gap-1.5 p-2 rounded-lg transition-all ${
                                   accentColor === color.value
-                                    ? 'bg-white dark:bg-slate-800 shadow-md ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-500'
-                                    : 'hover:bg-white dark:hover:bg-slate-800'
+                                    ? 'bg-white dark:bg-white/10 shadow-md ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-500'
+                                    : 'hover:bg-white dark:hover:bg-white/5'
                                 }`}
                               >
                                 <div
@@ -598,8 +598,8 @@ export const SettingsManager = () => {
                             onClick={() => handleLanguageChange('th')}
                             className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
                               language === 'th'
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/50'
-                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
                             }`}
                           >
                             <span className="text-2xl">🇹🇭</span>
@@ -615,8 +615,8 @@ export const SettingsManager = () => {
                             onClick={() => handleLanguageChange('en')}
                             className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
                               language === 'en'
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/50'
-                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                : 'border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
                             }`}
                           >
                             <span className="text-2xl">🇺🇸</span>
@@ -661,7 +661,7 @@ export const SettingsManager = () => {
                 <TabsContent value="profile" key="profile" className="mt-0 space-y-6">
                 <div className="animate-fade-in space-y-6">
                   {/* Profile Info Card */}
-                  <Card className="border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                  <Card className="border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-black/20">
                     <CardHeader className="pb-4">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center border border-blue-500/30">
@@ -674,7 +674,7 @@ export const SettingsManager = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex items-center gap-6 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <div className="flex items-center gap-6 p-4 bg-white dark:bg-black/40 rounded-xl border border-slate-200 dark:border-white/5">
                         <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
                           {profile.display_name.charAt(0).toUpperCase()}
                         </div>
@@ -694,7 +694,7 @@ export const SettingsManager = () => {
                             id="display_name"
                             value={profile.display_name || ''}
                             onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100"
+                            className="bg-white dark:bg-black/20 dark:border-white/10 text-slate-900 dark:text-slate-100"
                           />
                         </div>
                         <div className="space-y-2">
@@ -704,7 +704,7 @@ export const SettingsManager = () => {
                             type="email"
                             value={profile.email || ''}
                             disabled
-                            className="bg-slate-100 dark:bg-slate-800 cursor-not-allowed text-slate-900 dark:text-slate-100"
+                            className="bg-slate-100 dark:bg-white/5 dark:border-white/10 cursor-not-allowed text-slate-900 dark:text-slate-100"
                           />
                           <p className="text-xs text-slate-500 dark:text-slate-400">Email ไม่สามารถเปลี่ยนได้</p>
                         </div>
@@ -713,7 +713,7 @@ export const SettingsManager = () => {
                       <Button 
                         onClick={handleProfileUpdate} 
                         disabled={saving}
-                        className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900"
+                        className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-200 text-white dark:text-slate-900"
                       >
                         {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
                         บันทึกข้อมูล

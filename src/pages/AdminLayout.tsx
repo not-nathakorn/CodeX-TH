@@ -122,7 +122,7 @@ export function AdminLayout() {
                   label: displayName || user?.first_name || "Admin",
                   href: "#",
                   icon: (
-                    <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-white/10 to-white/5 flex items-center justify-center text-xs font-bold text-white shadow-md ring-1 ring-white/20">
+                    <div className="h-7 w-7 shrink-0 rounded-full bg-slate-900 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-white shadow-md ring-1 ring-slate-200 dark:ring-white/20">
                       {displayName?.charAt(0).toUpperCase() || user?.first_name?.charAt(0).toUpperCase() || "A"}
                     </div>
                   ),
@@ -157,7 +157,7 @@ export function AdminLayout() {
                   {activeTab === 'settings' && 'Settings'}
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">
-                  Welcome back, {user?.first_name || user?.email?.split('@')[0] || 'Admin'} • {new Date().toLocaleDateString('th-TH', { 
+                  Welcome back, {displayName || user?.first_name || user?.email?.split('@')[0] || 'Admin'} • {new Date().toLocaleDateString('th-TH', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
