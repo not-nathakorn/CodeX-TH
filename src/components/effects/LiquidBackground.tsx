@@ -2,55 +2,61 @@ import React from 'react';
 
 export const LiquidBackground = () => {
   return (
-    <div 
-      className="fixed inset-0 overflow-hidden pointer-events-none"
-      style={{ zIndex: 0 }}
-    >
-      {/* Base Background Layer */}
-      <div className="absolute inset-0 bg-[#f8fafc] dark:bg-[#0a0a0a] transition-colors duration-300" />
-      
-      {/* Colorful Blob Layer */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Blob 1: Blue - Top Left Corner */}
-        <div className="absolute top-[-20%] left-[-20%] md:top-[-10%] md:left-[-10%] w-[120vw] h-[120vw] md:w-[45vw] md:h-[45vw]">
-          <div 
-            className="w-full h-full rounded-full animate-blob-pulse blob-1 blur-[60px] md:blur-[100px]"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.45) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)',
-            }}
-          />
-        </div>
+    <>
+      <div 
+        className="fixed inset-0 overflow-hidden pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
+        {/* Base Background Layer */}
+        <div className="absolute inset-0 bg-[#f8fafc] dark:bg-[#0a0a0a] transition-colors duration-300" />
         
-        {/* Blob 2: Pink - Bottom Center */}
-        <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 translate-y-[20%] md:translate-y-[40%] w-[120vw] h-[120vw] md:w-[55vw] md:h-[55vw]">
-          <div 
-            className="w-full h-full rounded-full animate-blob-pulse animation-delay-2000 blob-2 blur-[80px] md:blur-[130px]"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.35) 0%, rgba(236, 72, 153, 0.15) 40%, transparent 70%)',
-            }}
-          />
-        </div>
-        
-        {/* Blob 3: Green/Cyan - Right edge, upper area */}
-        <div className="absolute top-[20%] right-[-40%] md:top-[5%] md:right-[-10%] w-[100vw] h-[100vw] md:w-[45vw] md:h-[45vw]">
-          <div 
-            className="w-full h-full rounded-full animate-blob-pulse animation-delay-4000 blob-3 blur-[60px] md:blur-[100px]"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.40) 0%, rgba(34, 197, 94, 0.20) 40%, transparent 70%)',
-            }}
-          />
+        {/* Colorful Blob Layer */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Blob 1: Blue - Top Left */}
+          <div className="absolute top-[-20%] left-[-20%] md:top-[-10%] md:left-[-10%] w-[120vw] h-[120vw] md:w-[45vw] md:h-[45vw]">
+            <div 
+              className="w-full h-full rounded-full animate-blob-pulse blob-1 blur-[60px] md:blur-[100px]"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.45) 0%, rgba(59, 130, 246, 0.25) 40%, transparent 70%)',
+              }}
+            />
+          </div>
+          
+          {/* Blob 2: Pink - Bottom Center */}
+          <div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 translate-y-[20%] md:translate-y-[40%] w-[120vw] h-[120vw] md:w-[55vw] md:h-[55vw]">
+            <div 
+              className="w-full h-full rounded-full animate-blob-pulse animation-delay-2000 blob-2 blur-[80px] md:blur-[130px]"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(236, 72, 153, 0.35) 0%, rgba(236, 72, 153, 0.15) 40%, transparent 70%)',
+              }}
+            />
+          </div>
+          
+          {/* Blob 3: Green/Cyan - Right Edge */}
+          <div className="absolute top-[20%] right-[-40%] md:top-[5%] md:right-[-10%] w-[100vw] h-[100vw] md:w-[45vw] md:h-[45vw]">
+            <div 
+              className="w-full h-full rounded-full animate-blob-pulse animation-delay-4000 blob-3 blur-[60px] md:blur-[100px]"
+              style={{
+                background: 'radial-gradient(circle at center, rgba(34, 197, 94, 0.40) 0%, rgba(34, 197, 94, 0.20) 40%, transparent 70%)',
+              }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Mobile Edge Fade Overlay to soften blob edges */}
-      <div className="absolute inset-0 pointer-events-none md:hidden">
-        {/* Vertical Edges (Left/Right) */}
-        <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
-        <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
+      {/* Foreground Overlay - High Z-index (z-40) to fade scrolling content on mobile */}
+      <div 
+        className="fixed inset-0 pointer-events-none md:hidden"
+        style={{ zIndex: 40 }}
+      >
+        {/* Top Edge - Deep Fade (Stronger to match example) */}
+        <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#f8fafc] via-[#f8fafc]/90 dark:from-[#0a0a0a] dark:via-[#0a0a0a]/90 to-transparent" />
         
-        {/* Horizontal Edges (Top/Bottom) - Soften scrolling boundaries */}
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
+
+
+        {/* Side Edges (Subtle) */}
+        <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-[#f8fafc] dark:from-[#0a0a0a] to-transparent" />
       </div>
       
       {/* Dark Mode Override Styles */}
@@ -65,6 +71,7 @@ export const LiquidBackground = () => {
           background: radial-gradient(circle at center, rgba(20, 184, 166, 0.25) 0%, rgba(20, 184, 166, 0.10) 40%, transparent 70%) !important;
         }
       `}</style>
-    </div>
+    </>
   );
 };
+
