@@ -104,7 +104,7 @@ export function AdminLayout() {
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-6 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl border-r border-slate-200/60 dark:border-slate-800 shadow-2xl">
+        <SidebarBody className="justify-between gap-6 bg-white/90 dark:bg-black/60 backdrop-blur-xl border-r border-slate-200/60 dark:border-white/10 shadow-2xl">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <Logo />
             <div className="mt-8 flex flex-col gap-2">
@@ -115,26 +115,26 @@ export function AdminLayout() {
               ))}
             </div>
           </div>
-          <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-slate-800 pt-4">
+          <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-white/10 pt-4">
             <div onClick={() => setActiveTab('settings')} className="cursor-pointer">
               <SidebarLink
                 link={{
                   label: displayName || user?.first_name || "Admin",
                   href: "#",
                   icon: (
-                    <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-slate-900">
+                    <div className="h-7 w-7 shrink-0 rounded-full bg-gradient-to-tr from-white/10 to-white/5 flex items-center justify-center text-xs font-bold text-white shadow-md ring-1 ring-white/20">
                       {displayName?.charAt(0).toUpperCase() || user?.first_name?.charAt(0).toUpperCase() || "A"}
                     </div>
                   ),
                 }}
-                className="hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all duration-200"
+                className="hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-all duration-200"
               />
             </div>
             <button
               onClick={logout}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 group w-full",
-                "text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                "text-slate-500 hover:text-red-600 hover:bg-red-50 dark:text-slate-400 dark:hover:bg-red-900/20"
               )}
             >
               <IconLogout className="h-5 w-5 shrink-0 transition-transform group-hover:-translate-x-1" />
@@ -147,7 +147,7 @@ export function AdminLayout() {
         <div className="p-2 sm:p-4 md:p-8 flex flex-col gap-4 sm:gap-6 flex-1 w-full h-full overflow-y-auto overflow-x-hidden">
           {/* Header Card with Glass Effect */}
           <div 
-            className="bg-white dark:bg-[#1E293B] rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-300"
+            className="bg-white dark:bg-black/40 backdrop-blur-xl rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-slate-200 dark:border-white/10 shadow-sm transition-all duration-300"
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">

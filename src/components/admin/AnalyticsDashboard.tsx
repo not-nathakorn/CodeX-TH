@@ -284,7 +284,7 @@ export const AnalyticsDashboard = () => {
     <div className="space-y-8 p-2 md:p-4">
       {/* Header Actions */}
       <div className="flex justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={fetchAnalytics} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <Button variant="outline" size="sm" onClick={fetchAnalytics} className="bg-white dark:bg-lack/20 dark:hover:bg-white/10 border-slate-200 dark:border-white/10 dark:text-slate-300">
           <RefreshCcw className="w-4 h-4 mr-2" />
           Refresh
         </Button>
@@ -303,7 +303,7 @@ export const AnalyticsDashboard = () => {
 
       {/* Main Chart */}
       <div
-        className="bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+        className="bg-white dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm"
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -411,7 +411,7 @@ export const AnalyticsDashboard = () => {
                 loginActivity.map((activity) => (
                   <div
                     key={activity.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 gap-2"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/5 gap-2"
                   >
                     <div className="flex items-start sm:items-center gap-3">
                       {activity.status === 'success' ? (
@@ -459,7 +459,7 @@ export const AnalyticsDashboard = () => {
 // Sub-components for cleaner code
 const Card = ({ title, value, icon, sub }: CardProps) => (
   <div 
-    className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all duration-200 hover:shadow-md z-10"
+    className="relative bg-white dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm transition-all duration-200 hover:shadow-md z-10"
   >
     <div className="flex justify-between items-start">
       <div>
@@ -479,7 +479,7 @@ const Card = ({ title, value, icon, sub }: CardProps) => (
 
 const ListCard = ({ title, icon, data, onItemClick }: ListCardProps) => (
   <div 
-    className="relative bg-white dark:bg-[#1E293B] p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm z-10"
+    className="relative bg-white dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm z-10"
   >
     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground">
       {React.cloneElement(icon, { className: "w-5 h-5 text-primary" })}
@@ -489,8 +489,8 @@ const ListCard = ({ title, icon, data, onItemClick }: ListCardProps) => (
       {data.map((item, i) => (
         <div 
           key={i} 
-          className={`flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-slate-100 dark:border-slate-100/10 ${
-            onItemClick && item.name.includes('/admin') ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-700' : ''
+          className={`flex justify-between items-center p-3 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors border border-slate-100 dark:border-white/5 ${
+            onItemClick && item.name.includes('/admin') ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-500/50' : ''
           }`}
           onClick={() => onItemClick && item.name.includes('/admin') && onItemClick(item.name)}
         >
