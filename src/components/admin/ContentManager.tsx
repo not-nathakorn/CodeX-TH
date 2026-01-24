@@ -1004,6 +1004,7 @@ export const ContentManager = () => {
             setShowProjectForm(false);
             setEditingProject(null);
           }}
+          nextOrderIndex={projects.length + 1}
         />
       )}
 

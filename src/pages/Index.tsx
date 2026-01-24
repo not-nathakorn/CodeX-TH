@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion } from "framer-motion";
 import { ModernNavigation } from "@/components/ModernNavigation";
 import { ModernHero } from "@/components/ModernHero";
@@ -12,15 +12,16 @@ import { MessageCircle } from "lucide-react";
 import { Project, Education, Experience } from "@/types";
 import { PortfolioService } from "@/services";
 import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+import { lazyWithRetry } from "@/lib/lazyLoad";
 
-// Lazy Load Components (Code Splitting)
-const ModernProjectCard = lazy(() => import("@/components/ModernProjectCard").then(m => ({ default: m.ModernProjectCard })));
-const ModernTimelineItem = lazy(() => import("@/components/ModernTimelineItem").then(m => ({ default: m.ModernTimelineItem })));
-const Meteors = lazy(() => import("@/components/effects/Meteors").then(m => ({ default: m.Meteors })));
+// Lazy Load Components (Code Splitting) with Auto-Retry
+const ModernProjectCard = lazyWithRetry(() => import("@/components/ModernProjectCard").then(m => ({ default: m.ModernProjectCard })));
+const ModernTimelineItem = lazyWithRetry(() => import("@/components/ModernTimelineItem").then(m => ({ default: m.ModernTimelineItem })));
+const Meteors = lazyWithRetry(() => import("@/components/effects/Meteors").then(m => ({ default: m.Meteors })));
 
-const ThailandEducationMap = lazy(() => import("@/components/ThailandEducationMap"));
-const ToolsShowcase = lazy(() => import("@/components/ToolsShowcase"));
-const GlowingFeatures = lazy(() => import("@/components/GlowingFeatures"));
+const ThailandEducationMap = lazyWithRetry(() => import("@/components/ThailandEducationMap"));
+const ToolsShowcase = lazyWithRetry(() => import("@/components/ToolsShowcase"));
+const GlowingFeatures = lazyWithRetry(() => import("@/components/GlowingFeatures"));
 
 const skills = [
   "React & TypeScript",
