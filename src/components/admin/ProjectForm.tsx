@@ -13,9 +13,10 @@ interface ProjectFormProps {
   project: Project | null;
   onClose: () => void;
   onSave: () => void;
+  nextOrderIndex?: number;
 }
 
-export const ProjectForm = ({ project, onClose, onSave }: ProjectFormProps) => {
+export const ProjectForm = ({ project, onClose, onSave, nextOrderIndex = 0 }: ProjectFormProps) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -41,8 +42,14 @@ export const ProjectForm = ({ project, onClose, onSave }: ProjectFormProps) => {
         order_index: project.order_index,
         is_visible: project.is_visible,
       });
+    } else {
+      // Set default order index for new project
+      setFormData(prev => ({
+        ...prev,
+        order_index: nextOrderIndex
+      }));
     }
-  }, [project]);
+  }, [project, nextOrderIndex]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

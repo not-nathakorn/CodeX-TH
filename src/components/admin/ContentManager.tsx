@@ -313,6 +313,10 @@ export const ContentManager = () => {
         </div>
 
         <div className="flex items-center gap-4 flex-1">
+          {/* Order Badge */}
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg border border-blue-500/20 shadow-inner">
+             {index + 1}
+          </div>
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center text-3xl shadow-inner border border-blue-500/20">
             {project.icon}
           </div>
@@ -788,7 +792,7 @@ export const ContentManager = () => {
             {/* Drag Overlay - Shows floating preview while dragging */}
             <DragOverlay>
               {activeProject ? (
-                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-[#1E293B] shadow-2xl scale-105 ring-4 ring-blue-500/30">
+                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-black/90 shadow-2xl scale-105 ring-4 ring-blue-500/30">
                   <div className="p-2 bg-blue-500 rounded-lg">
                     <GripVertical className="w-5 h-5 text-white" />
                   </div>
@@ -854,7 +858,7 @@ export const ContentManager = () => {
             {/* Drag Overlay for Education */}
             <DragOverlay>
               {activeEducation ? (
-                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-[#1E293B] shadow-2xl scale-105 ring-4 ring-blue-500/30">
+                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-black/90 shadow-2xl scale-105 ring-4 ring-blue-500/30">
                   <div className="p-2 bg-blue-500 rounded-lg">
                     <GripVertical className="w-5 h-5 text-white" />
                   </div>
@@ -920,7 +924,7 @@ export const ContentManager = () => {
             {/* Drag Overlay for Experience */}
             <DragOverlay>
               {activeExperience ? (
-                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-[#1E293B] shadow-2xl scale-105 ring-4 ring-blue-500/30">
+                <div className="flex items-center gap-4 p-5 rounded-2xl border-2 border-blue-500 bg-white dark:bg-black/90 shadow-2xl scale-105 ring-4 ring-blue-500/30">
                   <div className="p-2 bg-blue-500 rounded-lg">
                     <GripVertical className="w-5 h-5 text-white" />
                   </div>
