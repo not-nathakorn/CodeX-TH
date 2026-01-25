@@ -43,14 +43,7 @@ export const LiquidBackground = () => {
           </div>
         </div>
 
-        {/* Mobile Tinted Edge Fade (Solid Edges) - Fixes visible bezel lines */}
-        <div className="absolute inset-0 pointer-events-none md:hidden">
-          {/* Top - Solid Blue-50 fading out */}
-          <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#eff6ff] dark:from-[#172554] to-transparent" />
-          
-          {/* Bottom - Solid Pink-50 fading out (Lighter) */}
-          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#fdf2f8] dark:from-[#500724] to-transparent" />
-        </div>
+
       </div>
       
       {/* Dark Mode Override Styles */}
