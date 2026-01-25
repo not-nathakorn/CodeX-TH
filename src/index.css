@@ -105,20 +105,22 @@
     @apply border-border;
   }
 
-  /* Immersive Design - Solid background for Safari edge blending */
+  /* Immersive Design - Gradient background matching blob colors */
   html {
     scroll-behavior: smooth;
     overscroll-behavior: none;
     height: 100%;
     min-height: 100dvh;
-    background-color: #ffffff !important;
+    /* Gradient: Light blue (top/blob1) → White (middle) → Light pink (bottom/blob2) */
+    background: linear-gradient(to bottom, #eef6ff 0%, #ffffff 30%, #ffffff 70%, #fdf2f8 100%) !important;
+    background-attachment: fixed !important;
     margin: 0;
     padding: 0;
   }
 
-  /* Dark mode base color */
+  /* Dark mode */
   html.dark {
-    background-color: #0a0a0a !important;
+    background: #0a0a0a !important;
   }
 
   body {
