@@ -105,24 +105,27 @@
     @apply border-border;
   }
 
-  /* html background handles the base color, actual visual is in LiquidBackground */
+  /* Immersive Design - Solid background for Safari edge blending */
   html {
     scroll-behavior: smooth;
     overscroll-behavior: none;
     height: 100%;
     min-height: 100dvh;
-    background-color: transparent !important;
-    background: transparent !important;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
   }
 
   /* Dark mode base color */
   html.dark {
-    background: transparent !important;
+    background-color: #0a0a0a !important;
   }
 
   body {
-    overscroll-behavior: none; /* ปิด Rubber-band effect */
-    background: transparent !important;
+    overscroll-behavior: none;
+    background-color: #ffffff !important;
+    margin: 0;
+    padding: 0;
     
     @apply text-foreground font-sans;
     
@@ -137,9 +140,18 @@
       border-color 0.3s ease;
   }
 
-  /* Ensure dark mode body stays transparent */
+  /* Dark mode body */
   html.dark body {
-    background: transparent !important;
+    background-color: #0a0a0a !important;
+  }
+
+  /* Safe Area Padding Utility */
+  .safe-bottom-padding {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-top-padding {
+    padding-top: env(safe-area-inset-top);
   }
 
   /* HTML background handles the Safari overscroll color */

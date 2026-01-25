@@ -13,38 +13,37 @@
       (function () {
         try {
           var localTheme = localStorage.getItem("vite-ui-theme");
-          var systemDark = window.matchMedia(
-            "(prefers-color-scheme: dark)",
-          ).matches;
           var html = document.documentElement;
-          var targetColor = "#FFFFFF";
-          var isDark = false;
+          var isDark = localTheme === "dark";
 
-          // Robust determination of dark mode - FORCE DEFAULT TO LIGHT
-          if (localTheme === "dark") {
-            isDark = true;
-          } else {
-            // Default to light mode for new users, ignoring system preference
-            isDark = false;
-          }
-
-          /* 
-          // Previous logic that respected system preference:
-          } else if (localTheme === "light") {
-            isDark = false;
-          } else if (systemDark) {
-            isDark = true;
-          }
-          */
-
+          // Set theme class
           if (isDark) {
             html.classList.add("dark");
-            html.style.backgroundColor = "transparent";
-            html.style.background = "transparent";
           } else {
             html.classList.remove("dark");
-            html.style.backgroundColor = "transparent";
-            html.style.background = "transparent";
+          }
+
+          // Set background color for immersive design
+          var bgColor = isDark ? "#0a0a0a" : "#ffffff";
+          html.style.backgroundColor = bgColor;
+          document.body.style.backgroundColor = bgColor;
+
+          // Create/Update theme-color meta for Safari
+          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.name = "theme-color";
+            document.head.appendChild(metaThemeColor);
+          }
+          metaThemeColor.content = bgColor;
+          metaThemeColor.removeAttribute("media");
+
+          // Clean up any conflicting theme-color metas
+          var allMetas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < allMetas.length; i++) {
+            if (allMetas[i] !== metaThemeColor) {
+              allMetas[i].remove();
+            }
           }
         } catch (e) {}
       })();

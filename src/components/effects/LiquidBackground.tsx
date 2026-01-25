@@ -44,22 +44,6 @@ export const LiquidBackground = () => {
             />
           </div>
         </div>
-
-        {/* Edge Cleanup - Solid white at top/bottom edges */}
-        <div 
-          className="absolute top-0 left-0 right-0 pointer-events-none"
-          style={{
-            height: '60px',
-            background: 'linear-gradient(to bottom, #ffffff 0%, #ffffff 70%, transparent 100%)'
-          }}
-        />
-        <div 
-          className="absolute bottom-0 left-0 right-0 pointer-events-none"
-          style={{
-            height: '50px',
-            background: 'linear-gradient(to top, #ffffff 0%, #ffffff 70%, transparent 100%)'
-          }}
-        />
       </div>
 
       <style>{`
