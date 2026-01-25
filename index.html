@@ -39,14 +39,13 @@
 
           if (isDark) {
             html.classList.add("dark");
-            html.style.backgroundColor = "#0a0a0a";
-            html.style.background = "#0a0a0a";
+            html.style.backgroundColor = "transparent";
+            html.style.background = "transparent";
             targetColor = "#0a0a0a";
           } else {
             html.classList.remove("dark");
-            html.style.backgroundColor = "#f8fafc";
-            html.style.background =
-              "linear-gradient(to bottom, #f8fafc, #fdf2f8) fixed";
+            html.style.backgroundColor = "transparent";
+            html.style.background = "transparent";
             targetColor = "#f8fafc";
           }
 
@@ -437,11 +436,11 @@
     <style>
       /* Immediate background color - loads before any external CSS */
       html {
-        background-color: #f8fafc;
+        background-color: transparent;
       }
       /* User-selected dark mode via class */
       html.dark {
-        background-color: #0a0a0a;
+        background-color: transparent;
       }
     </style>
 
