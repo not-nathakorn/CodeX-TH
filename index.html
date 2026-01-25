@@ -39,12 +39,12 @@
 
           if (isDark) {
             html.classList.add("dark");
-            html.style.backgroundColor = "#0a0a0a"; // Matches LiquidBackground Dark
+            html.style.setProperty("background-color", "#0a0a0a", "important");
             targetColor = "#0a0a0a";
           } else {
             html.classList.remove("dark");
-            html.style.backgroundColor = "#f8fafc"; // Matches LiquidBackground Light
-            targetColor = "#f8fafc";
+            html.style.setProperty("background-color", "#f8fafc", "important"); // Top gradient color
+            targetColor = "#f8fafc"; // Match Status Bar to Top Gradient
           }
 
           // CRITICAL: Force update theme-color meta for Safari PWA edges
@@ -120,8 +120,8 @@
     <!-- Theme Color for Status Bar (will be dynamically updated by JS) -->
     <link rel="apple-touch-icon" href="/iOS-Logo-P.png" />
 
-    <!-- Theme Color for Safari Status Bar (Pink to match Bottom Home Indicator) -->
-    <meta name="theme-color" content="#fdf2f8" media="(prefers-color-scheme: light)" />
+    <!-- Theme Color for Safari Status Bar (Matching Top Gradient) -->
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
 
     <!-- PWA Status Bar Style -->
@@ -422,18 +422,16 @@
       media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
     <!-- iOS PWA Launch Screen Background Color (Critical for avoiding black screen) -->
+    <!-- iOS PWA Launch Screen Background Color (Critical for avoiding black screen) -->
     <style>
       /* Immediate background color - loads before any external CSS */
+      /* Updated to match gradient top/dark base to prevent flash */
       html {
-        background-color: #ffffff;
+        background-color: #f8fafc;
       }
       /* User-selected dark mode via class */
       html.dark {
-        background-color: #000000 !important;
-      }
-      /* User-selected light mode (override system dark) */
-      html:not(.dark) {
-        background-color: #ffffff;
+        background-color: #0a0a0a !important;
       }
     </style>
 

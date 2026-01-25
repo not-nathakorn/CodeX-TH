@@ -32,7 +32,6 @@ export const ModernNavigation = () => {
   return (
     <div
       className="glass-nav-container"
-      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <motion.nav
         initial={{ y: -100, opacity: 0 }}

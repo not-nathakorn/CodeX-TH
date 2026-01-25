@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const LiquidBackground = () => {
   return (
@@ -61,4 +60,3 @@ export const LiquidBackground = () => {
     </>
   );
 };
-
