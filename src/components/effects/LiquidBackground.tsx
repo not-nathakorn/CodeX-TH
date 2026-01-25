@@ -44,6 +44,23 @@ export const LiquidBackground = () => {
             />
           </div>
         </div>
+
+        {/* White Edge Overlays - ON TOP of blobs (z-10) for pure white edges */}
+        {/* These cover only the safe-area zones where no content exists */}
+        <div 
+          className="absolute top-0 left-0 right-0 bg-white dark:bg-[#0a0a0a]"
+          style={{ 
+            height: 'max(env(safe-area-inset-top, 47px), 47px)',
+            zIndex: 10
+          }}
+        />
+        <div 
+          className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#0a0a0a]"
+          style={{ 
+            height: 'max(env(safe-area-inset-bottom, 34px), 34px)',
+            zIndex: 10
+          }}
+        />
       </div>
 
       <style>{`
