@@ -41,33 +41,10 @@
             html.classList.add("dark");
             html.style.backgroundColor = "transparent";
             html.style.background = "transparent";
-            targetColor = "#0a0a0a";
           } else {
             html.classList.remove("dark");
             html.style.backgroundColor = "transparent";
             html.style.background = "transparent";
-            targetColor = "#f8fafc";
-          }
-
-          // CRITICAL: Force update theme-color meta for Safari PWA edges
-          var metaThemeColor = document.querySelector(
-            'meta[name="theme-color"]',
-          );
-          if (!metaThemeColor) {
-            metaThemeColor = document.createElement("meta");
-            metaThemeColor.name = "theme-color";
-            document.head.appendChild(metaThemeColor);
-          }
-          metaThemeColor.content = targetColor;
-          // Remove media attribute to prevent browser from reverting to system preference
-          metaThemeColor.removeAttribute("media");
-
-          // Clean up conflicting meta tags if any (robustness)
-          var allMetas = document.querySelectorAll('meta[name="theme-color"]');
-          for (var i = 0; i < allMetas.length; i++) {
-            if (allMetas[i] !== metaThemeColor) {
-              allMetas[i].remove();
-            }
           }
         } catch (e) {}
       })();
@@ -122,17 +99,6 @@
     <!-- Theme Color for Status Bar (will be dynamically updated by JS) -->
     <link rel="apple-touch-icon" href="/iOS-Logo-P.png" />
 
-    <!-- Theme Color for Safari Status Bar -->
-    <meta
-      name="theme-color"
-      content="#f8fafc"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#0a0a0a"
-      media="(prefers-color-scheme: dark)"
-    />
 
     <!-- PWA Status Bar Style -->
     <meta name="mobile-web-app-capable" content="yes" />
