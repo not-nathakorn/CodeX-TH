@@ -7,8 +7,8 @@ export const LiquidBackground = () => {
         className="fixed inset-0 overflow-hidden pointer-events-none"
         style={{ zIndex: 0 }}
       >
-        {/* Base Background Layer */}
-        <div className="absolute inset-0 bg-[#f8fafc] dark:bg-[#0a0a0a] transition-colors duration-300" />
+        {/* Base Background Layer - Gradient to match blobs (Blue Top, Pink Bottom) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#f8fafc] to-[#fdf2f8] dark:bg-[#0a0a0a] transition-colors duration-300" />
         
         {/* Colorful Blob Layer */}
         <div className="absolute inset-0 overflow-hidden">
