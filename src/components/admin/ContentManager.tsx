@@ -108,10 +108,26 @@ export const ContentManager = () => {
   };
 
   const fetchProjects = async () => {
-    // Use RPC to fetch all data (including hidden) securely
+    // Try RPC first (gets all items including hidden)
     const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'projects' });
     
-    if (error) throw error;
+    if (error) {
+      console.error('RPC get_admin_data projects error:', error);
+      // Fallback to direct select (might miss hidden items if RLS blocks them)
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('projects')
+        .select('*')
+        .order('order_index', { ascending: true });
+        
+      if (fallbackError) throw fallbackError;
+      
+      setProjects(fallbackData as Project[] || []);
+      if ((error as any).code === '42803') {
+         toast.error('Database Function Error (42803). Using limited fallback view.');
+      }
+      return;
+    }
+    
     // RPC returns JSON, cast it to type
     setProjects((data as unknown as Project[]) || []);
   };
@@ -119,14 +135,36 @@ export const ContentManager = () => {
   const fetchEducation = async () => {
     const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'education' });
     
-    if (error) throw error;
+    if (error) {
+      console.error('RPC get_admin_data education error:', error);
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('education')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (fallbackError) throw fallbackError;
+      
+      setEducation(fallbackData as Education[] || []);
+      return;
+    }
     setEducation((data as unknown as Education[]) || []);
   };
 
   const fetchExperience = async () => {
     const { data, error } = await supabase.rpc('get_admin_data', { p_table_name: 'experience' });
     
-    if (error) throw error;
+    if (error) {
+      console.error('RPC get_admin_data experience error:', error);
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('experience')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (fallbackError) throw fallbackError;
+      
+      setExperience(fallbackData as Experience[] || []);
+      return;
+    }
     setExperience((data as unknown as Experience[]) || []);
   };
 

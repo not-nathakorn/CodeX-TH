@@ -133,7 +133,18 @@ export function BBHAuthProvider({ children }: { children: ReactNode }) {
 
   // Logout - Clear session via BFF proxy
   const logout = useCallback((redirectTo?: string) => {
+    // If running on local dev (Vite), bypass proxy and just reload to simulate logout
+    // (Since we don't have the server backend running)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+         console.warn("Local Dev Logout: Clearing state and redirecting manually.");
+         setUser(null);
+         window.location.href = redirectTo || '/';
+         return;
+    }
+
     const redirect = redirectTo || '/';
+    // Ensure we are hitting the Vercel Function path correctly
+    // The relative path should be handled by Vercel rewrites if configured, or direct path
     window.location.href = `/api/auth/proxy?action=logout&redirect=${encodeURIComponent(redirect)}`;
   }, []);
 
