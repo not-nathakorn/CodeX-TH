@@ -23,15 +23,28 @@
             html.classList.remove("dark");
           }
 
-          // Set background to transparent for full immersive effect
-          html.style.backgroundColor = "transparent";
-          document.body.style.backgroundColor = "transparent";
+          // Match the start color of the gradient: hsl(210 40% 98%) ≈ #f7faff
+          var lightThemeColor = "#f7faff"; 
+          var darkThemeColor = "#0a0a0a";
+          
+          var bgColor = isDark ? darkThemeColor : lightThemeColor;
 
-          // Remove theme-color meta to allow content to show through status bar
-          // (Requires apple-mobile-web-app-status-bar-style="black-translucent")
+          // Create/Update theme-color meta for Safari status bar
+          var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (!metaThemeColor) {
+            metaThemeColor = document.createElement("meta");
+            metaThemeColor.name = "theme-color";
+            document.head.appendChild(metaThemeColor);
+          }
+          metaThemeColor.content = bgColor;
+          metaThemeColor.removeAttribute("media");
+
+          // Clean up conflicting metas
           var allMetas = document.querySelectorAll('meta[name="theme-color"]');
           for (var i = 0; i < allMetas.length; i++) {
-             allMetas[i].remove();
+            if (allMetas[i] !== metaThemeColor) {
+              allMetas[i].remove();
+            }
           }
         } catch (e) {}
       })();

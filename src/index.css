@@ -105,27 +105,37 @@
     @apply border-border;
   }
 
-  /* Immersive Design - Transparent to let LiquidBackground show through */
+  /* Base Variables matching 'Cheers' design */
+  :root {
+    --gradient-bg: linear-gradient(
+      135deg,
+      hsl(210 40% 98%) 0%,
+      hsl(220 30% 96%) 100%
+    );
+  }
+
   html {
     scroll-behavior: smooth;
     overscroll-behavior: none;
     height: 100%;
     min-height: 100dvh;
-    background-color: transparent !important;
-    background: transparent !important;
+    /* Clean white/transparent base, body handles the visual gradient */
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
   }
 
   /* Dark mode */
   html.dark {
-    background: transparent !important;
+    background-color: #0a0a0a;
   }
 
   body {
     overscroll-behavior: none;
-    background-color: transparent !important;
-    background: transparent !important;
+    /* Apply the Cheers gradient */
+    background: var(--gradient-bg) !important;
+    background-attachment: fixed !important; /* Keep gradient fixed while scrolling (optional, but looks nice) */
+    
     margin: 0;
     padding: 0;
     
@@ -144,10 +154,10 @@
 
   /* Dark mode body */
   html.dark body {
-    background: transparent !important;
+    background: #0a0a0a !important;
   }
 
-  /* Safe Area Padding Utility */
+  /* Safe Area Padding - Keep these as they are useful utilities */
   .safe-bottom-padding {
     padding-bottom: env(safe-area-inset-bottom);
   }
