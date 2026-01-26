@@ -15,6 +15,7 @@ import { ThemeColorManager } from "@/components/ThemeColorManager";
 import { LiquidBackground } from "@/components/effects/LiquidBackground";
 import { MaintenanceGuard } from "@/components/MaintenanceGuard";
 import { AppRoutes } from "./AppRoutes";
+import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 
 const queryClient = new QueryClient();
 
@@ -43,10 +44,12 @@ const App = () => (
               <ThemeColorManager />
               <LiquidBackground />
               <AnalyticsTracker />
-              <MaintenanceGuard>
-                <AppRoutes />
-                <NavigationDock />
-              </MaintenanceGuard>
+              <SiteSettingsProvider>
+                <MaintenanceGuard>
+                  <AppRoutes />
+                  <NavigationDock />
+                </MaintenanceGuard>
+              </SiteSettingsProvider>
             </BBHAuthProvider>
           </BrowserRouter>
           <Analytics />

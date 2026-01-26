@@ -6,7 +6,7 @@ import { Spotlight } from "./effects/Spotlight";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AnimatedText } from "./ui/AnimatedText";
 import { PinContainer } from "./ui/3d-pin";
-import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { vibrate } from "@/lib/utils";
 
 export const ModernHero = () => {

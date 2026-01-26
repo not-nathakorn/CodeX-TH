@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import MaintenancePage from "@/pages/MaintenancePage";
 import LazyFallback from "@/components/LazyFallback";

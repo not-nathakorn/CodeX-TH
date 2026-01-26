@@ -12,7 +12,7 @@ import { LineButton } from "@/components/LineButton";
 import { MessageCircle } from "lucide-react";
 import { Project, Education, Experience } from "@/types";
 import { PortfolioService } from "@/services";
-import { useSiteSettings } from "@/hooks/useSupabaseRealtime";
+import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { lazyWithRetry } from "@/lib/lazyLoad";
 
 // Lazy Load Components (Code Splitting) with Auto-Retry

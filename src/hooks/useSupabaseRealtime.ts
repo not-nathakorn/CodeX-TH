@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { SiteSettings } from '@/types/database.types';
+
 
 /**
  * Custom hook for subscribing to Supabase Realtime changes
@@ -178,107 +178,4 @@ export function useMapSettings() {
   return { mapVisible, enabledUniversities, loading, refetch: fetchSettings };
 }
 
-/**
- * Hook สำหรับ Site Settings
- * ใช้ใน Maintenance Mode และ Global Settings
- */
-export function useSiteSettings() {
-  // Initialize from localStorage if available
-  const [settings, setSettings] = useState<SiteSettings>(() => {
-    try {
-      const cached = localStorage.getItem('site_settings_cache');
-      if (cached) {
-        return JSON.parse(cached);
-      }
-    } catch (e) {
-      console.warn('Failed to parse site settings cache', e);
-    }
-    
-    return {
-      id: '',
-      site_name: 'CodeX',
-      site_tagline: 'Developer Portfolio',
-      contact_email: '',
-      maintenance_mode: false,
-      maintenance_message: 'เว็บไซต์กำลังปรับปรุง กรุณากลับมาใหม่ภายหลัง',
-      maintenance_title: 'Under Maintenance',
-      maintenance_detail: 'ขออภัยในความไม่สะดวก เรากำลังพัฒนาระบบเพื่อให้ดียิ่งขึ้น กรุณากลับมาใหม่ในภายหลัง',
-      maintenance_duration: 'A few hours',
-      google_analytics_id: '',
-      available_for_work: true,
-      social_linkedin: '',
-      social_line: '',
-      hero_image_url: '/Dev.png',
-      created_at: '',
-      updated_at: ''
-    };
-  });
 
-  // If we had cached data, start as not loading (stale-while-revalidate)
-  // Otherwise, start as loading
-  const [loading, setLoading] = useState(() => {
-    return !localStorage.getItem('site_settings_cache');
-  });
-
-  const fetchSettings = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .order('updated_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (!error && data) {
-        setSettings(data);
-        // Update cache
-        localStorage.setItem('site_settings_cache', JSON.stringify(data));
-      }
-    } catch (error) {
-      console.error('Error fetching site settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
-
-  // Listen for cross-tab updates (e.g. from Admin tab)
-  useEffect(() => {
-    const channel = new BroadcastChannel('site_settings_updates');
-    channel.onmessage = () => {
-      console.log('[Broadcast] Received update signal');
-      fetchSettings();
-    };
-    return () => channel.close();
-  }, [fetchSettings]);
-
-  // Polling fallback to ensure freshness if Realtime fails
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchSettings();
-    }, 5000); // Poll every 5 seconds (reduced freq from 2s to save resources)
-    return () => clearInterval(interval);
-  }, [fetchSettings]);
-
-  // Subscribe to realtime changes with aggressive update
-  useSupabaseRealtime<SiteSettings>(
-    'site_settings',
-    (payload) => {
-      console.log('[Realtime] Site settings event received:', payload);
-      // Trigger a re-fetch to ensure we get the full valid data including new columns
-      fetchSettings();
-      
-      if (payload.new) {
-        // Optimistically merge, but trust fetchSettings for final truth
-        const newSettings = { ...settings, ...(payload.new as SiteSettings) };
-        setSettings(newSettings);
-        localStorage.setItem('site_settings_cache', JSON.stringify(newSettings));
-      }
-    }
-  );
-
-  return { settings, loading, refetch: fetchSettings };
-}
